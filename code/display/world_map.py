@@ -50,7 +50,7 @@ class WorldMap:
                 pair_tuple = (region.id, neighbour.id)
                 if pair_tuple not in connection_has_been_drawn:
                     self.map.drawgreatcircle(region.longitude, region.latitude,
-                                             neighbour.longitude, neighbour.latitude, color='b')
+                                             neighbour.longitude, neighbour.latitude, color='k')
                     connection_has_been_drawn.add(pair_tuple)
 
 
