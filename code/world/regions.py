@@ -4,7 +4,7 @@ import os.path as path
 import textwrap
 
 thisdir = path.dirname(path.realpath(__file__))
-regions_csv = path.join(thisdir, '../../datasets/airport-population.csv')
+regions_csv = path.join(thisdir, '../../datasets/airport-filtered-population.csv')
 
 
 class Region:
