@@ -23,7 +23,10 @@ class Region:
 
         population: number of population in the region near the airport
 
-        neighbors: list of Region objects that are neighbors to this region
+        neighbors_all: list of Region objects that are neighbors to this region,
+                   this also includes regions from other countries
+        neighbors: list of Region objects that are neighbors to this region,
+                   this is only the regions from the same country
         airlines: list of Route objects that origin from this region
         """
 
@@ -36,7 +39,8 @@ class Region:
         self.country = data['country']
 
         self.population = int(float(data['pop_sum']))
-        self.neighbors = list(map(int, data['NEIGHBORS'].split(',')))
+        self.neighbors_all = list(map(int, data['NEIGHBORS'].split(',')))
+        self.neighbors = []
         self.airlines = []
 
     def __str__(self):
@@ -45,13 +49,14 @@ class Region:
         Place: {city} - {country} ({lat}, {long})
         population: {pop}
         airlines: {n_airlines}
-        neighbors: {n_neighbors}
+        neighbors: {n_neighbors} / {n_neighbors_all}
         """).format(
             id=self.id, name=self.name,
             city=self.city, country=self.country,
             lat=self.latitude, long=self.longitude,
             pop=self.population,
-            n_airlines=len(self.airlines), n_neighbors=len(self.neighbors))
+            n_airlines=len(self.airlines),
+            n_neighbors=len(self.neighbors), n_neighbors_all=len(self.neighbors_all))
 
 # dict mapping airport_id => Region()
 regions = dict()
@@ -63,4 +68,11 @@ for region_raw in csv.DictReader(open(regions_csv), dialect='unix'):
 
 # Translate ids into region objects
 for region in regions.values():
-    region.neighbors = list(map(lambda neighbor_id: regions[neighbor_id], region.neighbors))
+    region.neighbors_all = list(map(
+        lambda neighbor_id: regions[neighbor_id],
+        region.neighbors_all
+    ))
+    region.neighbors = list(filter(
+        lambda neighbor: neighbor.country == region.country,
+        region.neighbors_all
+    ))
