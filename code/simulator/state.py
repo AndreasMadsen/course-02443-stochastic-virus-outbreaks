@@ -1,31 +1,7 @@
 
 import collections
 
-class RegionSIR:
-    def __init__(self, susceptible, infected, removed):
-        self.susceptible = susceptible
-        self.infected = infected
-        self.removed = removed
-
-    def __str__(self):
-        return "RegionSIR(S={susceptible}, I={infected}, R={removed})".format(
-            susceptible=self.susceptible,
-            infected=self.infected,
-            removed=self.removed
-        )
-
-    def replace(self, sir):
-        self.susceptible = sir.susceptible
-        self.infected = sir.infected
-        self.removed = sir.removed
-
-    def inc_infected(self, infected):
-        self.susceptible -= infected
-        self.infected += infected
-
-    def inc_removed(self, removed):
-        self.infected -= removed
-        self.removed += removed
+from .sir import SIR
 
 class State:
     def __init__(self, regions, routes):
@@ -34,7 +10,7 @@ class State:
 
         self.region_sir = dict()
         for region in regions.values():
-            self.region_sir[region.id] = RegionSIR(region.population, 0, 0)
+            self.region_sir[region.id] = SIR(region.population, 0, 0)
 
     def set_outbreak(self, city, infected):
         """Create an outbreak in the busiest region in the city
