@@ -9,6 +9,24 @@ regions_csv = path.join(thisdir, '../../datasets/airport-population.csv')
 
 class Region:
     def __init__(self, data):
+        """Holds information about a Region
+
+        The attributes are:
+
+        id: the airport id
+        latitude: latitude coordinate
+        longitude: longitude coordinate
+
+        name: name of airport
+        city: name of the city the airport is within
+        country: name of the country the airport is within
+
+        population: number of population in the region near the airport
+
+        neighbors: list of Region objects that are neighbors to this region
+        airlines: list of Route objects that origin from this region
+        """
+
         self.id = int(data['airport_id'])
         self.latitude = float(data['latitude'])
         self.longitude = float(data['longitude'])

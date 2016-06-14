@@ -14,6 +14,16 @@ def parse_airport_id(id_str):
 
 class Route:
     def __init__(self, data):
+        """Holds information about a route
+
+        The attributes are:
+
+        airline_ids: list of all airline ids on this route
+        source: route source as a Region object
+        destination: route destination as a Region object
+
+        count: number of airlines on this route
+        """
         self.airline_ids = [parse_airport_id(data['airline_id'])]
 
         self.source_id = parse_airport_id(data['source_airport_id'])
@@ -21,7 +31,6 @@ class Route:
         self.destination_id = parse_airport_id(data['destination_airport_id'])
         self.destination = None
 
-        self.stops = int(data['stops'])
         self.count = 1
 
     @property
