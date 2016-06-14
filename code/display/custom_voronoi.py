@@ -28,7 +28,7 @@ def voronoi_plot_no_points(vor, ax=None):
     if vor.points.shape[1] != 2:
         raise ValueError("Voronoi diagram is not 2-D")
 
-    ax.plot(vor.points[:, 0], vor.points[:, 1], '.')
+    ax.plot(vor.points[:, 0], vor.points[:, 1], 'o')
     #ax.plot(vor.vertices[:,0], vor.vertices[:,1], 'o')
 
     for simplex in vor.ridge_vertices:
@@ -54,7 +54,7 @@ def voronoi_plot_no_points(vor, ax=None):
 
             ax.plot([vor.vertices[i, 0], far_point[0]],
                     [vor.vertices[i, 1], far_point[1]], 'k--')
-
+    
     _adjust_bounds(ax, vor.points)
 
     return ax.figure

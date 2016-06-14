@@ -6,6 +6,9 @@ from .custom_voronoi import voronoi_plot_no_points
 
 
 class WorldMap:
+    """
+    Class implementing functionality for plotting data on a world map
+    """
     def __init__(self, projection="cea"):
         self.map = Basemap(projection=projection, llcrnrlat=-90, urcrnrlat=90,
                            llcrnrlon=-180, urcrnrlon=180, lat_ts=20,
@@ -54,10 +57,23 @@ class WorldMap:
                     connection_has_been_drawn.add(pair_tuple)
 
 
-        #mapped_centers = [self.map(x.longitude, x.latitude) for x in region_list]
-        #vor = Voronoi(mapped_centers)
-        #voronoi_plot_no_points(vor)
-        
+ 
+    def add_voronoi(self, region_list):
+        """
+        Adds voronoi to the map
+
+        Parameters
+        ----------
+        region_list : List of objectes with .longitude and .latitude propeties
+
+        Returns
+        -------
+        None : mutates self.map
+        """
+        mapped_centers = [self.map(x.longitude, x.latitude) for x in region_list]
+        vor = Voronoi(mapped_centers)
+        voronoi_plot_no_points(vor)
+
     def show_plot(self, title="map", continent_color='coral', water_color='aqua', include_coast_lines=True):
         if include_coast_lines:
             self.map.drawcoastlines()
