@@ -1,0 +1,92 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}	% Flere sprog tegnsæt (fx æøå)
+\usepackage[danish]{babel}	% Dansk orddeling (kan ændres til english)
+\usepackage[T1]{fontenc}		% Brug 8-bit front
+\usepackage{lmodern}		% Vektor front
+
+\usepackage[svgnames]{xcolor} % Udvider \color med "SVG color names"
+\usepackage{graphicx}	% Kompatibilitet til visning af pixel billeder (.png, .jpg, .gif)
+\usepackage{epstopdf}	% Kompatibilitet til visning af vector billeder (.eps)
+\usepackage{parskip}	% Tilføjer vertikal margin til hver paragraph
+\usepackage{float}		% TIllader H som positions parameter
+\usepackage{subcaption}	% Tillader subfigure, subtable samt \captions
+\usepackage{amssymb}	% Flere matematiske symboler
+\usepackage{amsthm}      % Endnu flere matematiske symboler
+\usepackage{mathtools}	% Det meste matematik (indeholder ams­math og rettelser)
+\usepackage{xfrac}		% Flere fracs (\sfrac{}{})
+\usepackage{listings}	% Indsæt code
+\usepackage{fancyhdr}	% Side hoved og sidefod
+\usepackage{todonotes}	% Cool todo notes, [disable] skjuler todos
+\usepackage[bookmarks,bookmarksnumbered,hidelinks]{hyperref} % clickable pdf (til sidst)
+
+%listing settings, æøå support, font config, line number, left lines
+\lstset{
+    breakatwhitespace=false, breaklines=true,
+    inputencoding=utf8, extendedchars=true,
+    literate={å}{{\aa}}1 {æ}{{\ae}}1 {ø}{{\o}}1 {Å}{{\AA}}1 {Æ}{{\AE}}1 {Ø}{{\O}}1,
+    keepspaces=true, showstringspaces=false, basicstyle=\small\ttfamily,
+    frame=L, numbers=left, numberstyle=\scriptsize\color{gray},
+    keywordstyle=\color{SteelBlue}\ttfamily,
+    stringstyle=\color{IndianRed}\ttfamily,
+    commentstyle=\color{Teal}\ttfamily,
+} 
+
+\setlength{\marginparwidth}{80pt} 				% Mere brede på margin notes og todos
+\setlength{\parindent}{0cm}   					% Deaktiver afsnit indrykning
+\DeclareGraphicsExtensions{.pdf,.eps,.png,.jpg,.gif}	% ændre til .png, .jpg for hurtig visning
+\pagestyle{fancy}
+\fancyhead[L]{Andreas Madsen – s123598}
+
+\begin{document}
+
+\title{Project Description: Monte Carlo Epidemiology}
+\author{Fredrik Wolgast Rørbech (s123956), Andreas Madsen (s123598)}
+\date{June 13 2016}
+\maketitle
+
+We would like to simulate a human virus infection and measure the infection ratio in a given subpopulation, such as a city, country, global, etc. along with a variance estimate. To this end a variance reduction technique should be applied. If the initial model is successful, we could then simulate the effect of a major event, such as a virus spread from the Olympic Games or systematically closing the airports.
+
+The simulation model is simplification of the GLEaM model\footnote{http://ifisc.uib-csic.es/~jramasco/text/sup\_gleam.pdf}. The simulation is done in 3 layers:
+\begin{itemize}
+\item in region: people in the same region may effect others in the region.
+\item commuting: people transiting between neighboring regions, may effect others during transit and others in the other region when arriving. The number of people commuting is modelled by $C \frac{N_i^\alpha N_j^\gamma}{\mathrm{exp}^{\beta d_{ij}}}$ (see GLEaM paper).
+\item airplane: people transiting between distant regions with airplane, may effect others during transit and others in the other region when arriving. The number of people commuting by airplane, is modeled by using an airport dataset and calculating a constant pr. airline commute rate.
+\end{itemize}
+
+There is a dataset of all airports\footnote{http://openflights.org/data.html}, this is then used as basis for subdividing the world into regions applying a Voronoi algorithm. The population in each of these areas is then calculated by using a population density heatmap\footnote{http://neo.sci.gsfc.nasa.gov/view.php?datasetId=SEDAC\_POP}.
+
+The number of people who gets infected and cured in each of these layers is simulated using a stochastic SIR model. The SIR model is expressed in differential equations as:
+\begin{equation}
+\begin{aligned}
+S'(t) &= -\frac{\beta}{N} I(t) S(t) \\
+I'(t) &= \frac{\beta}{N} I(t) S(t)  - \gamma I(t) \\
+R'(t) &= \gamma I(t) \\
+S(0) &= N - I_0 \\
+I(0) &= I_0 \\
+R(0) &= 0
+\end{aligned}
+\end{equation}
+where:
+\begin{itemize}
+\item $S(t)$ is the number of people who can be infected
+\item $I(t)$ is the number of people who are infected
+\item $R(t)$ is the number of people who can't be infected (dead or immune).
+\item $\beta$ is the infection rate
+\item $\gamma$ is the cure + death rate
+\item $N$ total population size 
+\item $I_0$ initial number of sick people
+\end{itemize}
+
+The stochastic version of this, is to use binomial distributions:
+\begin{equation}
+\begin{aligned}
+\Delta I_t &\sim \text{Binom}(S_t, \frac{\beta}{N} I_t) \\
+\Delta R_t &\sim \text{Binom}(R_t, \gamma) \\
+S_{t+1} &= S_t - \Delta I_t \\
+I_{t+1} &= I_t + \Delta I_t - \Delta R_t \\
+R_{t+1} &= R_t + \Delta R_t \\
+\end{aligned}
+\end{equation}
+
+\end{document}
