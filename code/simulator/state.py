@@ -1,7 +1,6 @@
 
 import collections
-import time
-import numpy as np
+
 
 from .sir import SIR
 
@@ -13,8 +12,7 @@ class State:
     def __init__(self, regions, routes, beta=0.1, gamma=0.01):
         self.regions = regions
         self.routes = routes
-        self.beta = beta
-        self.gamma = gamma
+
 
         self.region_sir = dict()
         for region in regions.values():

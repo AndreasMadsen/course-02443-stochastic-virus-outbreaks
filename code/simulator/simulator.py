@@ -27,17 +27,28 @@ class Simulator:
         key-value pairs (time_step, state)
         """
 
-        time_step = 0
+        # used for moving average time estimate
+        iteration_time_estimate = 0
         state_list = [self.state.copy()]
         for i in range(1, iterations + 1):
+            # start timing
             start_time = time.time()
 
             self.step()
             state_list = state_list + [self.state.copy()]
 
+            # end timing
             end_time = time.time()
             time_diff = end_time - start_time
-            time_left = time_diff * (iterations - i)
+
+            # update time estimate
+            if iteration_time_estimate == 0:
+                iteration_time_estimate = time_diff
+            else:
+                iteration_time_estimate = 0.9 * iteration_time_estimate + 0.1 * time_diff
+            time_left = iteration_time_estimate * (iterations - i)
+
+            # if verbose print
             if verbose:
                 print("Iteration {0:d}/{1:d} took {2:.2f} seconds. ({3:.2f} seconds left)".format(
                     i, iterations, time_diff, time_left))
@@ -80,6 +91,12 @@ class Simulator:
         i_transfer = np.floor(region_sir_from.infected * transfer_fraction)
         r_transfer = np.floor(region_sir_from.removed * transfer_fraction)
 
+        if np.isnan(s_transfer):
+            print(region_sir_from.susceptible)
+            print(transfer_fraction)
+            print(n_people)
+            print(total_transfer)
+            raise Exception("nan")
         region_sir_from.susceptible -= s_transfer
         region_sir_to.susceptible += s_transfer
         region_sir_from.infected -= i_transfer
@@ -106,6 +123,12 @@ class Simulator:
 
             # for each neighbour compute a transfer of s, i and r
             for neighbour_region in region.neighbors_all:
+
+                # check that we still have people left in the region
+                if current_region_sir.total_population() == 0:
+                    # no people left break
+                    break
+
                 neighbour_sir = self.state.region_sir[neighbour_region.id]
 
                 self.transfer_between_regions(current_region_sir,
