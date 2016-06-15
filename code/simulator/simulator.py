@@ -44,6 +44,49 @@ class Simulator:
 
         return state_list
 
+    def update_single_region(self, region_sir):
+        """Spreads the virus and updates removed within region
+        """
+        n_people = region_sir.total_population()
+
+        # the virus spreads:
+        # todo make sir_object have this parameter
+        new_infected = np.random.binomial(
+            region_sir.susceptible,
+            self.beta * region_sir.infected / n_people)
+
+        region_sir.inc_infected(new_infected)
+
+
+        # some people are curred:
+        new_curred = np.random.binomial(
+            region_sir.infected, self.gamma)
+        region_sir.inc_removed(new_curred)
+
+    def transfer_between_regions(self, region_sir_from, region_sir_to):
+        """transfers people from from_region to to_region
+        Assumes that S/I/R classes share the same travel frequency
+        """
+
+        n_people = region_sir_from.total_population()
+
+        # total number of people to transfer from a to b
+        total_transfer = np.random.binomial(n_people,
+                                            self.transfer_prob)
+        # convert to a probability
+        transfer_fraction = total_transfer / n_people
+
+        s_transfer = np.floor(region_sir_from.susceptible * transfer_fraction)
+        i_transfer = np.floor(region_sir_from.infected * transfer_fraction)
+        r_transfer = np.floor(region_sir_from.removed * transfer_fraction)
+
+        region_sir_from.susceptible -= s_transfer
+        region_sir_to.susceptible += s_transfer
+        region_sir_from.infected -= i_transfer
+        region_sir_to.infected += i_transfer
+        region_sir_from.removed -= r_transfer
+        region_sir_to.removed += r_transfer
+
     def step(self, verbose=False):
         """Advances the state to the next time point by both accounting for
         virus spreading within a reigon and to the neighbours
@@ -53,47 +96,19 @@ class Simulator:
         for region_id in self.state.region_sir.keys():
             region = self.state.regions[region_id]
             current_region_sir = self.state.region_sir[region_id]
-            total_region_population = current_region_sir.total_population()
-            # skip regions with no people
-            if total_region_population == 0:
-                continue
-            # the virus spreads:
-            # todo make sir_object have this parameter
-            new_infected = np.random.binomial(
-                current_region_sir.susceptible,
-                self.beta *
-                current_region_sir.infected /
-                total_region_population)
-            current_region_sir.inc_infected(new_infected)
 
-            # some people are curred:
-            new_curred = np.random.binomial(
-                current_region_sir.infected, self.gamma)
-            current_region_sir.inc_removed(new_curred)
+            # skip regions with no people
+            if current_region_sir.total_population() == 0:
+                continue
+
+            self.update_single_region(current_region_sir)
+
 
             # for each neighbour compute a transfer of s, i and r
             for neighbour_region in region.neighbors_all:
-                neighbour = self.state.region_sir[neighbour_region.id]
-                # total number of people to transfer from current region to
-                # current neighbour
-                total_transfer = np.random.binomial(
-                    total_region_population, self.transfer_prob)
-                transfer_fraction = total_transfer / total_region_population
+                neighbour_sir = self.state.region_sir[neighbour_region.id]
 
-                s_transfer = np.floor(
-                    current_region_sir.susceptible *
-                    transfer_fraction)
-                i_transfer = np.floor(
-                    current_region_sir.infected *
-                    transfer_fraction)
-                r_transfer = np.floor(
-                    current_region_sir.removed * transfer_fraction)
-
-                current_region_sir.susceptible -= s_transfer
-                neighbour.susceptible += s_transfer
-                current_region_sir.infected -= i_transfer
-                neighbour.infected += i_transfer
-                current_region_sir.removed -= r_transfer
-                neighbour.removed += r_transfer
+                self.transfer_between_regions(current_region_sir,
+                                              neighbour_sir)
 
                 n_transfers_processed += 1
