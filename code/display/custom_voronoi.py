@@ -4,6 +4,7 @@ import numpy as np
 from scipy._lib.decorator import decorator as _decorator
 from scipy.spatial._plotutils import _held_figure, _adjust_bounds
 
+
 @_held_figure
 def voronoi_plot_no_points(vor, ax=None):
     """
@@ -29,7 +30,7 @@ def voronoi_plot_no_points(vor, ax=None):
         raise ValueError("Voronoi diagram is not 2-D")
 
     ax.plot(vor.points[:, 0], vor.points[:, 1], 'o')
-    #ax.plot(vor.vertices[:,0], vor.vertices[:,1], 'o')
+    # ax.plot(vor.vertices[:,0], vor.vertices[:,1], 'o')
 
     for simplex in vor.ridge_vertices:
         simplex = np.asarray(simplex)

@@ -12,16 +12,16 @@ if __name__ == "__main__":
     for i in range(0, 1):
         print('run {0:d}'.format(i))
         state = State(regions, routes)
-        state.set_outbreak('Paris', 1000, verbose=True) # start outbreak
+        state.set_outbreak('Paris', 1000, verbose=True)  # start outbreak
         sol = [state.total_SIR()]
-        #sol = [state.region_sir[1382].get_sir()]
+        # sol = [state.region_sir[1382].get_sir()]
         for j in range(1, 365):
             if j % 100 == 0:
                 print('step {0:d}'.format(j))
 
             state.step(transfer_prob=0.05)
             sol = sol + [state.total_SIR()]
-            #sol = sol + [state.region_sir[1382].get_sir()]
+            # sol = sol + [state.region_sir[1382].get_sir()]
 
         sol = np.asarray(sol)
 
@@ -31,5 +31,5 @@ if __name__ == "__main__":
 
     print(np.sum(sol, axis=0))
     plt.legend([p1, p2, p3], ['S', 'I', 'R'])
-    #plt.legend([p2, p3], ['I', 'R'])
+    # plt.legend([p2, p3], ['I', 'R'])
     plt.show()

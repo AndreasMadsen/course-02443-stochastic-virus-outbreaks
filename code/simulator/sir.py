@@ -1,5 +1,6 @@
 
 class SIR:
+
     def __init__(self, susceptible, infected, removed):
         self.susceptible = susceptible
         self.infected = infected
@@ -69,7 +70,7 @@ class SIR:
 
     def get_sir(self):
         return (self.susceptible, self.infected, self.removed)
-        
+
     def total_population(self):
         """
         Returns
@@ -77,4 +78,3 @@ class SIR:
         int : susceptible + infected + removed
         """
         return self.susceptible + self.infected + self.removed
-        

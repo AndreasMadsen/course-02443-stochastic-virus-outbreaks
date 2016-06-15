@@ -3,7 +3,9 @@ import numpy as np
 import scipy.stats
 import matplotlib.pyplot as plt
 
+
 class SIR:
+
     def __init__(self, beta=0.1e-2, gamma=0.5e-3, B=1.5, N=30000):
         self.beta = beta
         self.gamma = gamma

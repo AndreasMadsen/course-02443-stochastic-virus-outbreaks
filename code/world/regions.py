@@ -4,10 +4,13 @@ import os.path as path
 import textwrap
 
 thisdir = path.dirname(path.realpath(__file__))
-regions_csv = path.join(thisdir, '../../datasets/airport-filtered-population.csv')
+regions_csv = path.join(
+    thisdir,
+    '../../datasets/airport-filtered-population.csv')
 
 
 class Region:
+
     def __init__(self, data):
         """Holds information about a Region
 
@@ -51,12 +54,16 @@ class Region:
         airlines: {n_airlines}
         neighbors: {n_neighbors} / {n_neighbors_all}
         """).format(
-            id=self.id, name=self.name,
-            city=self.city, country=self.country,
-            lat=self.latitude, long=self.longitude,
+            id=self.id,
+            name=self.name,
+            city=self.city,
+            country=self.country,
+            lat=self.latitude,
+            long=self.longitude,
             pop=self.population,
             n_airlines=len(self.airlines),
-            n_neighbors=len(self.neighbors), n_neighbors_all=len(self.neighbors_all))
+            n_neighbors=len(self.neighbors),
+            n_neighbors_all=len(self.neighbors_all))
 
 # dict mapping airport_id => Region()
 regions = dict()

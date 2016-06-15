@@ -5,9 +5,11 @@ import numpy as np
 
 from .sir import SIR
 
+
 class State:
     """ State class representing a multi-compartment sir model
     """
+
     def __init__(self, regions, routes, beta=0.1, gamma=0.01):
         self.regions = regions
         self.routes = routes
@@ -31,7 +33,9 @@ class State:
                 elif len(outbreak_region.airlines) < len(region.airlines):
                     outbreak_region = region
         if verbose:
-            print("starting outbreak in city '{0}' with id '{1}'".format(city, outbreak_region.id))
+            print(
+                "starting outbreak in city '{0}' with id '{1}'".format(
+                    city, outbreak_region.id))
         # Create the outbreak
         self.region_sir[outbreak_region.id].inc_infected(infected)
 
@@ -67,7 +71,6 @@ class State:
 
         return (total_susceptible, total_infected, total_removed)
 
-
     def step(self, transfer_prob=0.001, verbose=False):
         """Advances the state to the next time point by both accounting for
         virus spreading within a reigon and to the neighbours
@@ -81,26 +84,37 @@ class State:
             # skip regions with no people
             if total_region_population == 0:
                 continue
-            #the virus spreads:
-            #todo make sir_object have this parameter
-            new_infected = np.random.binomial(current_region_sir.susceptible, 
-                                              self.beta * current_region_sir.infected / total_region_population)
+            # the virus spreads:
+            # todo make sir_object have this parameter
+            new_infected = np.random.binomial(
+                current_region_sir.susceptible,
+                self.beta *
+                current_region_sir.infected /
+                total_region_population)
             current_region_sir.inc_infected(new_infected)
 
             # some people are curred:
-            new_curred = np.random.binomial(current_region_sir.infected, self.gamma)
+            new_curred = np.random.binomial(
+                current_region_sir.infected, self.gamma)
             current_region_sir.inc_removed(new_curred)
 
             # for each neighbour compute a transfer of s, i and r
             for neighbour_region in region.neighbors_all:
                 neighbour = self.region_sir[neighbour_region.id]
-                #total number of people to transfer from current region to current neighbour
-                total_transfer = np.random.binomial(total_region_population, transfer_prob)
+                # total number of people to transfer from current region to
+                # current neighbour
+                total_transfer = np.random.binomial(
+                    total_region_population, transfer_prob)
                 transfer_fraction = total_transfer / total_region_population
 
-                s_transfer = np.floor(current_region_sir.susceptible * transfer_fraction)
-                i_transfer = np.floor(current_region_sir.infected * transfer_fraction)
-                r_transfer = np.floor(current_region_sir.removed * transfer_fraction)
+                s_transfer = np.floor(
+                    current_region_sir.susceptible *
+                    transfer_fraction)
+                i_transfer = np.floor(
+                    current_region_sir.infected *
+                    transfer_fraction)
+                r_transfer = np.floor(
+                    current_region_sir.removed * transfer_fraction)
 
                 current_region_sir.susceptible -= s_transfer
                 neighbour.susceptible += s_transfer
@@ -114,8 +128,10 @@ class State:
         end_time = time.time()
         time_diff = end_time - start_time
         if verbose:
-            print("""took step in {0:.2f} seconds. 
-             ({1:d} transfers processed ==> {2:.2f} [transfer/sec])""".format(time_diff, 
-                                                                              n_transfers_processed, 
-                                                                              n_transfers_processed / time_diff))
-                  
+            print(
+                """took step in {0:.2f} seconds.
+             ({1:d} transfers processed ==> {2:.2f} [transfer/sec])""".format(
+                    time_diff,
+                    n_transfers_processed,
+                    n_transfers_processed /
+                    time_diff))

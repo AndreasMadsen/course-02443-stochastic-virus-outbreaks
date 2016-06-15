@@ -6,13 +6,16 @@ import textwrap
 thisdir = path.dirname(path.realpath(__file__))
 routes_csv = path.join(thisdir, '../../datasets/airport-routes.csv')
 
+
 def parse_airport_id(id_str):
     if id_str == '\\N':
         return None
     else:
         return int(id_str)
 
+
 class Route:
+
     def __init__(self, data):
         """Holds information about a route
 
@@ -51,7 +54,8 @@ routes = dict()
 # Parse data and construct region objects
 for routes_raw in csv.DictReader(open(routes_csv), dialect='unix'):
     route = Route(routes_raw)
-    if not route.real_route: continue
+    if not route.real_route:
+        continue
 
     if route.route_id in routes:
         routes[route.route_id].add_route(route)
