@@ -2,6 +2,7 @@
 
 import time
 import numpy as np
+import math
 
 class Simulator:
     """CLass used for simulating compartmentalized SIR models
@@ -58,7 +59,7 @@ class Simulator:
     def update_single_region(self, region_sir):
         """Spreads the virus and updates removed within region
         """
-        n_people = region_sir.total_population()
+        n_people = region_sir.total_pop
 
         # the virus spreads:
         # todo make sir_object have this parameter
@@ -79,37 +80,33 @@ class Simulator:
         Assumes that S/I/R classes share the same travel frequency
         """
 
-        n_people = region_sir_from.total_population()
+        n_people = region_sir_from.total_pop
 
         # total number of people to transfer from a to b
         total_transfer = np.random.binomial(n_people,
                                             self.transfer_prob)
-        # convert to a probability
-        transfer_fraction = total_transfer / n_people
+        # let p = total_transfer / n_people
+        # s_transfer = floor(region.susceptible * p)
+        # to speed up with do the above with:
+        # (region_susceptible * total_transfer) div n_people
 
-        s_transfer = np.floor(region_sir_from.susceptible * transfer_fraction)
-        i_transfer = np.floor(region_sir_from.infected * transfer_fraction)
-        r_transfer = np.floor(region_sir_from.removed * transfer_fraction)
+        s_transfer = (region_sir_from.susceptible * total_transfer) //  n_people
+        i_transfer = (region_sir_from.infected * total_transfer) // n_people
+        r_transfer = total_transfer - s_transfer - i_transfer
 
-        region_sir_from.susceptible -= s_transfer
-        region_sir_to.susceptible += s_transfer
-        region_sir_from.infected -= i_transfer
-        region_sir_to.infected += i_transfer
-        region_sir_from.removed -= r_transfer
-        region_sir_to.removed += r_transfer
+        region_sir_from.transfer_from(s_transfer, i_transfer, r_transfer)
+        region_sir_to.transfer_to(s_transfer, i_transfer, r_transfer)
 
     def step(self, verbose=False):
         """Advances the state to the next time point by both accounting for
         virus spreading within a reigon and to the neighbours
         """
 
-        n_transfers_processed = 0
-        for region_id in self.state.region_sir.keys():
-            region = self.state.regions[region_id]
+        for region_id, region in self.state.regions.items():
             current_region_sir = self.state.region_sir[region_id]
 
             # skip regions with no people
-            if current_region_sir.total_population() == 0:
+            if current_region_sir.total_pop == 0:
                 continue
 
             self.update_single_region(current_region_sir)
@@ -119,7 +116,7 @@ class Simulator:
             for neighbour_region in region.neighbors:
 
                 # check that we still have people left in the region
-                if current_region_sir.total_population() == 0:
+                if current_region_sir.total_pop == 0:
                     # no people left break
                     break
 
@@ -128,20 +125,16 @@ class Simulator:
                 self.transfer_between_regions(current_region_sir,
                                               neighbour_sir)
 
-                n_transfers_processed += 1
-
             # for each airline route compute transfer of s, i and raise
             # remember region.airlines is a list of Route
             for route in region.airlines:
 
                 # check that we still have people left in the region
-                if current_region_sir.total_population() == 0:
-                    # no people left break
+                if current_region_sir.total_pop == 0:
+                    # no people left to distribute break
                     break
 
                 neighbour_sir = self.state.region_sir[route.destination.id]
 
                 self.transfer_between_regions(current_region_sir,
                                               neighbour_sir)
-
-                n_transfers_processed += 1

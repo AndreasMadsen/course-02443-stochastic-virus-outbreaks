@@ -5,6 +5,7 @@ class SIR:
         self.susceptible = susceptible
         self.infected = infected
         self.removed = removed
+        self.total_pop = susceptible + infected + removed
 
     def copy(self):
         return SIR(self.susceptible, self.infected, self.removed)
@@ -30,6 +31,7 @@ class SIR:
             self.susceptible += other.susceptible
             self.infected += other.infected
             self.removed += other.removed
+            self.update_pop()
             return self
         elif other == 0:
             return self
@@ -59,6 +61,7 @@ class SIR:
         self.susceptible = sir.susceptible
         self.infected = sir.infected
         self.removed = sir.removed
+        self.total_pop = self.susceptible + self.infected + self.removed
 
     def inc_infected(self, infected):
         self.susceptible -= infected
@@ -71,10 +74,41 @@ class SIR:
     def get_sir(self):
         return (self.susceptible, self.infected, self.removed)
 
-    def total_population(self):
-        """
+    def transfer_to(self, add_s, add_i, add_r):
+        """ transfers people to sir object
+
+        Parameters
+        ----------
+        add_s (Int) : wanted increase of susceptible
+        add_i (Int) : wanted increase of infected
+        add_r (Int) : wanted increase of removed
+
         Returns
         -------
-        int : susceptible + infected + removed
+        None : Mutates the SIR object
         """
-        return self.susceptible + self.infected + self.removed
+
+        self.susceptible += add_s
+        self.infected += add_i
+        self.removed += add_r
+        self.total_pop += add_s + add_i + add_r
+
+    def transfer_from(self, rem_s, rem_i, rem_r):
+        """ transfers people to sir object
+
+        Parameters
+        ----------
+        rem_s (Int) : wanted removal of susceptible
+        rem_i (Int) : wanted removal of infected
+        rem_r (Int) : wanted removal of removed
+
+        Returns
+        -------
+        None : Mutates the SIR object
+        """
+
+        self.susceptible -= rem_s
+        self.infected -= rem_i
+        self.removed -= rem_r
+        self.total_pop -= rem_s + rem_i + rem_r
+
