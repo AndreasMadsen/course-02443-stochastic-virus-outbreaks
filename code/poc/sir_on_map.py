@@ -4,7 +4,7 @@ import numpy as np
 import scipy.stats
 import matplotlib.pyplot as plt
 
-from simulator import State
+from simulator import State, Simulator
 from world import regions, routes
 
 if __name__ == "__main__":
@@ -13,16 +13,11 @@ if __name__ == "__main__":
         print('run {0:d}'.format(i))
         state = State(regions, routes)
         state.set_outbreak('Paris', 1000, verbose=True)  # start outbreak
-        sol = [state.total_SIR()]
-        # sol = [state.region_sir[1382].get_sir()]
-        for j in range(1, 365):
-            if j % 100 == 0:
-                print('step {0:d}'.format(j))
+        sim = Simulator(state, transfer_prob=0.05)
 
-            state.step(transfer_prob=0.05)
-            sol = sol + [state.total_SIR()]
-            # sol = sol + [state.region_sir[1382].get_sir()]
+        state_list = sim.run(iterations=365, verbose=True)
 
+        sol = [x.total_SIR() for x in state_list]
         sol = np.asarray(sol)
 
         p1, = plt.plot(sol[:, 0], color='SteelBlue', alpha=0.5, label='S')
