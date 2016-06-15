@@ -8,7 +8,7 @@ from simulator import State, Simulator
 from world import regions, routes
 
 if __name__ == "__main__":
-    DO_PLOT = False
+    DO_PLOT = True
     if DO_PLOT:
         plt.figure()
     for i in range(0, 1):

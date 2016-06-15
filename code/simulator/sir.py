@@ -31,7 +31,7 @@ class SIR:
             self.susceptible += other.susceptible
             self.infected += other.infected
             self.removed += other.removed
-            self.update_pop()
+            self.total_pop += other.total_pop
             return self
         elif other == 0:
             return self

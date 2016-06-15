@@ -13,7 +13,7 @@ class Simulator:
         self.gamma = gamma
         self.transfer_prob = transfer_prob
 
-
+    # @profile
     def run(self, iterations=365, verbose=False):
         """
         run n simulation iterations from the current state
@@ -56,25 +56,29 @@ class Simulator:
 
         return state_list
 
+    # @profile
     def update_single_region(self, region_sir):
         """Spreads the virus and updates removed within region
         """
         n_people = region_sir.total_pop
 
         # the virus spreads:
-        # todo make sir_object have this parameter
         new_infected = np.random.binomial(
             region_sir.susceptible,
             self.beta * region_sir.infected / n_people)
-
-        region_sir.inc_infected(new_infected)
+        #region_sir.inc_infected(new_infected)
+        region_sir.infected += new_infected
+        region_sir.susceptible -= new_infected
 
 
         # some people are curred:
         new_curred = np.random.binomial(
             region_sir.infected, self.gamma)
-        region_sir.inc_removed(new_curred)
+        #region_sir.inc_removed(new_curred)
+        region_sir.removed += new_curred
+        region_sir.infected -= new_curred
 
+    # @profile
     def transfer_between_regions(self, region_sir_from, region_sir_to):
         """transfers people from from_region to to_region
         Assumes that S/I/R classes share the same travel frequency
@@ -95,8 +99,10 @@ class Simulator:
         r_transfer = total_transfer - s_transfer - i_transfer
 
         region_sir_from.transfer_from(s_transfer, i_transfer, r_transfer)
+
         region_sir_to.transfer_to(s_transfer, i_transfer, r_transfer)
 
+    # @profile
     def step(self, verbose=False):
         """Advances the state to the next time point by both accounting for
         virus spreading within a reigon and to the neighbours
