@@ -66,3 +66,15 @@ class SIR:
     def inc_removed(self, removed):
         self.infected -= removed
         self.removed += removed
+
+    def get_sir(self):
+        return (self.susceptible, self.infected, self.removed)
+        
+    def total_population(self):
+        """
+        Returns
+        -------
+        int : susceptible + infected + removed
+        """
+        return self.susceptible + self.infected + self.removed
+        

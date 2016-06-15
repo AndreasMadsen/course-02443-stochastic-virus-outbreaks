@@ -14,15 +14,15 @@ f, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(16,10))
 for i in range(0, 10):
     print('run %d' % i)
     #area 1
-    sir1 = SIR(N=50)
+    sir1 = SIR(N=50, beta=0.1, gamma=0.01)
 
     #area 2
-    sir2 = SIR(N=50, beta=sir1.beta*3) #*10
+    sir2 = SIR(N=50, beta=0.1, gamma=0.01) #*10
 
     sol_1 = [sir1.init()]
     sol_2 = [sir2.init()]
     transfer_prob = 0.001
-    for i in range(1, 30000):
+    for i in range(1, 365):
 
         s_1_to_2 = np.random.binomial(sir1.S, transfer_prob)
         i_1_to_2 = np.random.binomial(sir1.I, transfer_prob)

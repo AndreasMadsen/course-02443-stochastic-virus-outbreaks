@@ -9,10 +9,10 @@ class WorldMap:
     """
     Class implementing functionality for plotting data on a world map
     """
-    def __init__(self, projection="cea"):
+    def __init__(self, projection="cea", resolution="c"):
         self.map = Basemap(projection=projection, llcrnrlat=-90, urcrnrlat=90,
                            llcrnrlon=-180, urcrnrlon=180, lat_ts=20,
-                           resolution='c')
+                           resolution=resolution)
 
     def add_points(self, points):
         """
