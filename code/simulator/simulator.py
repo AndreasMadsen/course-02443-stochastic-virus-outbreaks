@@ -91,12 +91,6 @@ class Simulator:
         i_transfer = np.floor(region_sir_from.infected * transfer_fraction)
         r_transfer = np.floor(region_sir_from.removed * transfer_fraction)
 
-        if np.isnan(s_transfer):
-            print(region_sir_from.susceptible)
-            print(transfer_fraction)
-            print(n_people)
-            print(total_transfer)
-            raise Exception("nan")
         region_sir_from.susceptible -= s_transfer
         region_sir_to.susceptible += s_transfer
         region_sir_from.infected -= i_transfer
@@ -122,7 +116,7 @@ class Simulator:
 
 
             # for each neighbour compute a transfer of s, i and r
-            for neighbour_region in region.neighbors_all:
+            for neighbour_region in region.neighbors:
 
                 # check that we still have people left in the region
                 if current_region_sir.total_population() == 0:
@@ -130,6 +124,22 @@ class Simulator:
                     break
 
                 neighbour_sir = self.state.region_sir[neighbour_region.id]
+
+                self.transfer_between_regions(current_region_sir,
+                                              neighbour_sir)
+
+                n_transfers_processed += 1
+
+            # for each airline route compute transfer of s, i and raise
+            # remember region.airlines is a list of Route
+            for route in region.airlines:
+
+                # check that we still have people left in the region
+                if current_region_sir.total_population() == 0:
+                    # no people left break
+                    break
+
+                neighbour_sir = self.state.region_sir[route.destination.id]
 
                 self.transfer_between_regions(current_region_sir,
                                               neighbour_sir)
