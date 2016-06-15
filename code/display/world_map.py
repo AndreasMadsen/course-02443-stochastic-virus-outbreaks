@@ -64,9 +64,10 @@ class WorldMap:
             dtype='float32'
         )
 
-    def _update_plot(self, i, simulator, region_ids, scat):
+    def _update_plot(self, i, simulator, region_ids, scat, time):
         scat.set_array(self._getinfected(simulator, region_ids))
-        return scat,
+        time.set_text('t = %d' % i)
+        return scat, time
 
     def animate(self, simulator, frames=300, fps=1 / 20):
         """
@@ -102,11 +103,13 @@ class WorldMap:
         )
         self.map.colorbar(scat)
 
+        time = self.ax.text(*self.map(-170, -65), 't = 0', fontsize=12)
+
         # Create animation object
         self.ani = animation.FuncAnimation(
             self.fig, self._update_plot,
             frames=frames, interval=1 / fps,
-            fargs=(simulator, region_ids, scat)
+            fargs=(simulator, region_ids, scat, time)
         )
 
     def add_neighbours(self, regions):
