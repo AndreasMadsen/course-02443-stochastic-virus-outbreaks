@@ -54,7 +54,7 @@ def voronoi_plot_no_points(vor, ax=None):
 
             ax.plot([vor.vertices[i, 0], far_point[0]],
                     [vor.vertices[i, 1], far_point[1]], 'k--')
-    
+
     _adjust_bounds(ax, vor.points)
 
     return ax.figure

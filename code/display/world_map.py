@@ -57,7 +57,7 @@ class WorldMap:
                     connection_has_been_drawn.add(pair_tuple)
 
 
- 
+
     def add_voronoi(self, region_list):
         """
         Adds voronoi to the map
@@ -77,10 +77,8 @@ class WorldMap:
     def show_plot(self, title="map", continent_color='coral', water_color='aqua', include_coast_lines=True):
         if include_coast_lines:
             self.map.drawcoastlines()
-        
+
         self.map.fillcontinents(color=continent_color, lake_color=water_color)
         self.map.drawmapboundary(fill_color=water_color)
         plt.title(title)
         plt.show()
-
-

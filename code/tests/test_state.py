@@ -30,4 +30,3 @@ def test_copy():
     assert_equal(state.region_sir[1382].susceptible, 3756)
     assert_equal(state.region_sir[1382].infected, 1000)
     assert_equal(state.region_sir[1382].removed, 0)
-
