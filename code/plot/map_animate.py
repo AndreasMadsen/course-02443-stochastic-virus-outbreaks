@@ -7,7 +7,7 @@ from world import regions, routes
 state = State(regions, routes)
 state.set_outbreak('Paris', 1000)
 
-sim = Simulator(state)
+sim = Simulator(state, transfer_prob=0.05)
 
 # plot regions on a world map
 base_map = WorldMap(resolution="c")

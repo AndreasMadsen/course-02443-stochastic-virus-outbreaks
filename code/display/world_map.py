@@ -103,7 +103,7 @@ class WorldMap:
         )
         self.map.colorbar(scat)
 
-        time = self.ax.text(*self.map(-170, -65), 't = 0', fontsize=12)
+        time = self.ax.text(*self.map(-170, -65), s='t = 0', fontsize=12)
 
         # Create animation object
         self.ani = animation.FuncAnimation(

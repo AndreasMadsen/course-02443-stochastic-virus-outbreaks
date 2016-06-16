@@ -7,7 +7,7 @@ import math
 class Simulator:
     """CLass used for simulating compartmentalized SIR models
     """
-    def __init__(self, init_state, beta=0.1, gamma=0.01, transfer_prob=0.001):
+    def __init__(self, init_state, beta=0.1, gamma=0.01, transfer_prob=0.005):
         self.state = init_state.copy()
         self.beta = beta
         self.gamma = gamma
