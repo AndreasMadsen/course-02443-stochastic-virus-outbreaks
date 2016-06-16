@@ -71,7 +71,7 @@ class SIR:
         self.infected -= removed
         self.removed += removed
 
-    def get_sir(self):
+    def as_tuple(self):
         return (self.susceptible, self.infected, self.removed)
 
     def transfer_to(self, add_s, add_i, add_r):
@@ -111,4 +111,3 @@ class SIR:
         self.infected -= rem_i
         self.removed -= rem_r
         self.total_pop -= rem_s + rem_i + rem_r
-

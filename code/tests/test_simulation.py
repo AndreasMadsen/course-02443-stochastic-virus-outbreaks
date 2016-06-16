@@ -9,11 +9,12 @@ from world import regions, routes
 def test_simulate():
     state = State(regions, routes)
     state.set_outbreak('Paris', 1000)
-    total_population_pre = sum(state.total_SIR())
 
     sim = Simulator(state)
-    state_list = sim.run(iterations=1, verbose=True)
-    total_population_post = sum(state_list[-1].total_SIR())
+
+    total_population_pre = sim.state.total_sir().total_pop
+    sim.step()
+    total_population_post = sim.state.total_sir().total_pop
 
     # check that transfers and disease spread didn't change the world
     # population'

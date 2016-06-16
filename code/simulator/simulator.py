@@ -89,17 +89,16 @@ class Simulator:
         # total number of people to transfer from a to b
         total_transfer = np.random.binomial(n_people,
                                             self.transfer_prob)
+
         # let p = total_transfer / n_people
         # s_transfer = floor(region.susceptible * p)
         # to speed up with do the above with:
         # (region_susceptible * total_transfer) div n_people
-
-        s_transfer = (region_sir_from.susceptible * total_transfer) //  n_people
+        s_transfer = (region_sir_from.susceptible * total_transfer) // n_people
         i_transfer = (region_sir_from.infected * total_transfer) // n_people
         r_transfer = total_transfer - s_transfer - i_transfer
 
         region_sir_from.transfer_from(s_transfer, i_transfer, r_transfer)
-
         region_sir_to.transfer_to(s_transfer, i_transfer, r_transfer)
 
     # @profile

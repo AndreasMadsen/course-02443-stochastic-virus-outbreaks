@@ -8,11 +8,9 @@ from .sir import SIR
 class State:
     """ State class representing a multi-compartment sir model
     """
-
     def __init__(self, regions, routes, beta=0.1, gamma=0.01):
         self.regions = regions
         self.routes = routes
-
 
         self.region_sir = dict()
         for region in regions.values():
@@ -47,7 +45,7 @@ class State:
 
         return state_copy
 
-    def total_SIR(self):
+    def total_sir(self):
         """Used for getting the total number of susceptible, infected and removed
         accross all regions
 
@@ -57,14 +55,6 @@ class State:
 
         Returns
         -------
-        3-tutple: (Susceptible, infected, removed)
+        SIR object
         """
-        total_susceptible = 0
-        total_infected = 0
-        total_removed = 0
-        for region in self.region_sir.values():
-            total_susceptible += region.susceptible
-            total_infected += region.infected
-            total_removed += region.removed
-
-        return (total_susceptible, total_infected, total_removed)
+        return sum(self.region_sir.values())

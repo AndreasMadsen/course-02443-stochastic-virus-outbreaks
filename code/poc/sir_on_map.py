@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
         state_list = sim.run(iterations=365, verbose=True)
 
-        sol = [x.total_SIR() for x in state_list]
+        sol = [x.total_sir().as_tuple() for x in state_list]
         sol = np.asarray(sol)
 
         if DO_PLOT:
