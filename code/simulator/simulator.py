@@ -53,7 +53,8 @@ class Simulator:
             if verbose:
                 print("Iteration {0:d}/{1:d} took {2:.2f} seconds ({3:.2f} seconds left). \
                 Infected={4:d} ".format(
-                    i, iterations, time_diff, time_left, self.state.total_SIR()[1]))
+                    i, iterations, time_diff, time_left,
+                    self.state.total_sir().as_tuple()[1]))
 
             yield self.state.copy()
 

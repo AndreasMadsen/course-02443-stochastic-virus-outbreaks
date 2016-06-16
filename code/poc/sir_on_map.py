@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
         sol = []
         for state in sim.run(iterations=365, verbose=True):
-            sol.append(state.total_sir().as_tutple())
+            sol.append(state.total_sir().as_tuple())
 
         sol = np.asarray(sol)
 
