@@ -30,13 +30,13 @@ class Simulator:
 
         # used for moving average time estimate
         iteration_time_estimate = 0
-        state_list = [self.state.copy()]
+        yield self.state.copy()
         for i in range(1, iterations + 1):
             # start timing
             start_time = time.time()
 
             self.step()
-            state_list = state_list + [self.state.copy()]
+            #state_list = state_list + [self.state.copy()]
 
             # end timing
             end_time = time.time()
@@ -51,10 +51,12 @@ class Simulator:
 
             # if verbose print
             if verbose:
-                print("Iteration {0:d}/{1:d} took {2:.2f} seconds. ({3:.2f} seconds left)".format(
-                    i, iterations, time_diff, time_left))
+                print("Iteration {0:d}/{1:d} took {2:.2f} seconds ({3:.2f} seconds left). \
+                Infected={4:d} ".format(
+                    i, iterations, time_diff, time_left, self.state.total_SIR()[1]))
 
-        return state_list
+            yield self.state.copy()
+
 
     # @profile
     def update_single_region(self, region_sir):
@@ -79,7 +81,8 @@ class Simulator:
         region_sir.infected -= new_curred
 
     # @profile
-    def transfer_between_regions(self, region_sir_from, region_sir_to):
+    @classmethod
+    def transfer_between_regions(cls, region_sir_from, region_sir_to, transfer_prob):
         """transfers people from from_region to to_region
         Assumes that S/I/R classes share the same travel frequency
         """
@@ -87,9 +90,8 @@ class Simulator:
         n_people = region_sir_from.total_pop
 
         # total number of people to transfer from a to b
-        total_transfer = np.random.binomial(n_people,
-                                            self.transfer_prob)
 
+        total_transfer = np.random.binomial(n_people, transfer_prob)
         # let p = total_transfer / n_people
         # s_transfer = floor(region.susceptible * p)
         # to speed up with do the above with:
@@ -118,6 +120,7 @@ class Simulator:
 
 
             # for each neighbour compute a transfer of s, i and r
+            n_neighbours = len(region.neighbors)
             for neighbour_region in region.neighbors:
 
                 # check that we still have people left in the region
@@ -127,11 +130,15 @@ class Simulator:
 
                 neighbour_sir = self.state.region_sir[neighbour_region.id]
 
-                self.transfer_between_regions(current_region_sir,
-                                              neighbour_sir)
+                Simulator.transfer_between_regions(
+                    current_region_sir, neighbour_sir,
+                    neighbour_sir.total_pop /
+                    (neighbour_sir.total_pop + current_region_sir.total_pop)
+                    * self.transfer_prob / n_neighbours)
 
             # for each airline route compute transfer of s, i and raise
             # remember region.airlines is a list of Route
+            n_routes = len(region.airlines)
             for route in region.airlines:
 
                 # check that we still have people left in the region
@@ -141,5 +148,8 @@ class Simulator:
 
                 neighbour_sir = self.state.region_sir[route.destination.id]
 
-                self.transfer_between_regions(current_region_sir,
-                                              neighbour_sir)
+                Simulator.transfer_between_regions(
+                    current_region_sir, neighbour_sir,
+                    neighbour_sir.total_pop /
+                    (neighbour_sir.total_pop + current_region_sir.total_pop)
+                    * self.transfer_prob / n_routes)

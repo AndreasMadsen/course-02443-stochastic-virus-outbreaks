@@ -17,9 +17,10 @@ if __name__ == "__main__":
         state.set_outbreak('Paris', 1000, verbose=True)  # start outbreak
         sim = Simulator(state, transfer_prob=0.05)
 
-        state_list = sim.run(iterations=365, verbose=True)
+        sol = []
+        for state in sim.run(iterations=365, verbose=True):
+            sol.append(state.total_sir().as_tutple())
 
-        sol = [x.total_sir().as_tuple() for x in state_list]
         sol = np.asarray(sol)
 
         if DO_PLOT:
