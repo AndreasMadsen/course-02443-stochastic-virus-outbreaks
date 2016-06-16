@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from scipy.spatial import Voronoi
 import numpy as np
+import math
 
 from ._custom_voronoi import voronoi_plot_no_points
 
@@ -93,14 +94,21 @@ class WorldMap:
             (regions[id].latitude for id in region_ids),
             dtype='float'
         )
-        x, y = self.map(longitudes, latitudes)
+        sizes = np.fromiter(
+            (math.sqrt(simulator.state.region_sir[id].total_pop) \
+            for id in simulator.state.region_sir),
+            dtype='float'
+        )
+        sizes = 5 + (sizes - min(sizes)) / (max(sizes)-min(sizes)) * 50
+        x_map, y_map = self.map(longitudes, latitudes)
 
         # Initialize scatter plot, which will be updated in animation
         scat = self.map.scatter(
-            x, y, c=self._getinfected(simulator, region_ids),
-            s=5, lw=0, zorder=2,
+            x_map, y_map, c=self._getinfected(simulator, region_ids),
+            s=sizes, lw=0, zorder=2,
             vmin=0, vmax=1, cmap='summer'
         )
+
         self.map.colorbar(scat)
 
         time = self.ax.text(*self.map(-170, -65), s='t = 0', fontsize=12)
