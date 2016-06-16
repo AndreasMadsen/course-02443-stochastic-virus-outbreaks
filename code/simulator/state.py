@@ -16,6 +16,30 @@ class State:
         for region in regions.values():
             self.region_sir[region.id] = SIR(region.population, 0, 0)
 
+    def _print_connection_count(self, city_name):
+        """ Prints the number of ingoing and outgoing connections from a city
+
+        Parameters
+        ---------
+        city_name : string
+
+        Returns
+        -------
+        None : prints output
+        """
+
+        ## use the following
+        region_ids = [x.id for x in self.regions.values() if x.city == city_name]
+        for region_id in region_ids:
+            outgoing_airlines = len(self.regions[region_id].airlines)
+            ingoing_airlines = len([i for i in self.regions \
+                if self.regions[region_id] in \
+                [x.destination for x in self.regions[i].airlines]])
+
+            print("""'{0}' (id={3:d}) had {1:d} outgoing and {2:d}
+             ingoing airline connections""".format(
+                 city_name, outgoing_airlines, ingoing_airlines, region_id))
+
     def set_outbreak(self, city, infected, verbose=False):
         """Create an outbreak in the busiest region in the city
         """

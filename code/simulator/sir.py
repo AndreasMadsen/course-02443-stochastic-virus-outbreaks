@@ -92,6 +92,9 @@ class SIR:
         self.infected += add_i
         self.removed += add_r
         self.total_pop += add_s + add_i + add_r
+        if self.total_pop < 0:
+            print(add_s, add_i, add_r)
+            raise Exception("total population < 0 after transferring to region")
 
     def transfer_from(self, rem_s, rem_i, rem_r):
         """ transfers people to sir object
@@ -111,3 +114,5 @@ class SIR:
         self.infected -= rem_i
         self.removed -= rem_r
         self.total_pop -= rem_s + rem_i + rem_r
+        if self.total_pop < 0:
+            raise Exception("total population < 0 after transferring from region")
