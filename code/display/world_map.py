@@ -70,7 +70,7 @@ class WorldMap:
         time.set_text('t = %d' % (i + 1))
         return scat, time
 
-    def animate(self, simulator, frames=300, fps=1 / 20):
+    def animate(self, simulator, frames=365, fps=1 / 20):
         """
         Animates a simulator which implements a step function
 

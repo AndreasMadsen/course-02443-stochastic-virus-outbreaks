@@ -19,7 +19,7 @@ if __name__ == "__main__":
         sim = Simulator(state, transfer_prob=0.005)
 
         sol = []
-        for state in sim.run(iterations=365 // 2, verbose=True):
+        for state in sim.run(iterations=365, verbose=True):
             sol.append(state.total_sir().as_tuple())
             #sol.append(state.region_sir[4029].as_tuple())
 
