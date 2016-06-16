@@ -67,7 +67,7 @@ class WorldMap:
 
     def _update_plot(self, i, simulator, region_ids, scat, time):
         scat.set_array(self._getinfected(simulator, region_ids))
-        time.set_text('t = %d' % i)
+        time.set_text('t = %d' % (i + 1))
         return scat, time
 
     def animate(self, simulator, frames=300, fps=1 / 20):
@@ -117,7 +117,8 @@ class WorldMap:
         self.ani = animation.FuncAnimation(
             self.fig, self._update_plot,
             frames=frames, interval=1 / fps,
-            fargs=(simulator, region_ids, scat, time)
+            fargs=(simulator, region_ids, scat, time),
+            repeat=False
         )
 
     def add_neighbours(self, regions):
