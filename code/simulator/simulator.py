@@ -4,8 +4,12 @@ import time
 import numpy as np
 import random
 import textwrap
+import collections
 
 from ._time_left import TimeLeft
+from ._dirichlet_sampler import sample_dirichlet
+
+SirPair = collections.namedtuple('SirPair', ['current', 'prev'])
 
 class Simulator:
     """CLass used for simulating compartmentalized SIR models
@@ -76,9 +80,17 @@ class Simulator:
             region_sir.infected, self.gamma)
         region_sir.inc_removed(new_curred)
 
-    def _transfer_sir(self,
-                      sir_from, sir_to,
-                      prev_sir_from, prev_sir_to):
+    def _calculate_transfer_probabilities(self, from_sir, connected_sir):
+        probability = []
+        for to_sir in connected_sir:
+            # Calculate transfer properbility
+            relative_pop = to_sir.prev.total_pop / (
+                to_sir.prev.total_pop + from_sir.prev.total_pop
+            )
+            probability.append(self.transfer_prob * relative_pop)
+        return probability
+
+    def _transfer_sir(self, from_sir, connected_sir):
         """transfers people from from_region to to_region
         Assumes that S/I/R classes share the same travel frequency
 
@@ -92,39 +104,54 @@ class Simulator:
         None : mutates from and to regions
         """
         # Nothing can be transfered stop early
-        if (sir_from.total_pop == 0): return
+        if (from_sir.current.total_pop == 0): return
 
-        # Calculate transfer properbility
-        relative_pop = prev_sir_to.total_pop / (
-            prev_sir_to.total_pop + prev_sir_from.total_pop
+        # Calculate transfer probabilities
+        probability = self._calculate_transfer_probabilities(
+            from_sir, connected_sir
         )
-        properbility = self.transfer_prob * relative_pop
 
         # total number of people to transfer from a to b
-        n_people = prev_sir_from.total_pop
-        total_transfer = np.random.binomial(n_people, properbility)
+        n_people = from_sir.prev.total_pop
 
-        # This calculates
-        #   p = total_transfer / n_people
-        #   s_transfer = floor(region.susceptible * p)
-        # but avoids floats for speed
-        s_transfer = (prev_sir_from.susceptible * total_transfer) // n_people
-        i_transfer = (prev_sir_from.infected * total_transfer) // n_people
-        r_transfer = total_transfer - s_transfer - i_transfer
+        # get number of people that should be transfered, this guarantees
+        # that sum(transfer_people) <= n_people
+        transfer_people = sample_dirichlet(probability, n_people)
 
-        # check that we are not transferring more people than available
-        if (s_transfer > sir_from.susceptible or
-           i_transfer > sir_from.infected or
-           r_transfer > sir_from.removed):
-            s_transfer = min(s_transfer, sir_from.susceptible)
-            i_transfer = min(i_transfer, sir_from.infected)
-            r_transfer = min(r_transfer, sir_from.removed)
+        # Transfer people
+        for total_transfer, to_sir in zip(transfer_people, connected_sir):
+            # This calculates
+            #   p = total_transfer / n_people
+            #   s_transfer = floor(region.susceptible * p)
+            # but avoids floats for speed
+            s_transfer = (from_sir.prev.susceptible * total_transfer) // n_people
+            i_transfer = (from_sir.prev.infected * total_transfer) // n_people
+            r_transfer = total_transfer - s_transfer - i_transfer
 
-        # increment/decrement counters
-        sir_from.transfer_from(s_transfer, i_transfer, r_transfer)
-        sir_to.transfer_to(s_transfer, i_transfer, r_transfer)
+            # increment/decrement counters
+            from_sir.current.transfer_from(s_transfer, i_transfer, r_transfer)
+            to_sir.current.transfer_to(s_transfer, i_transfer, r_transfer)
 
-    # @profile
+    def _get_neighbours_sir(self, region, prev_state):
+        sir = []
+        for neighbour_region in region.neighbors:
+            neighbour_id = neighbour_region.id
+            neighbour_sir = self.state.region_sir[neighbour_id]
+            prev_neighbour_sir = prev_state.region_sir[neighbour_id]
+
+            sir.append(SirPair(neighbour_sir, prev_neighbour_sir))
+        return sir
+
+    def _get_airlines_sir(self, region, prev_state):
+        sir = []
+        for route in region.airlines:
+            neighbour_id = route.destination.id
+            neighbour_sir = self.state.region_sir[neighbour_id]
+            prev_neighbour_sir = prev_state.region_sir[neighbour_id]
+
+            sir.append(SirPair(neighbour_sir, prev_neighbour_sir))
+        return sir
+
     def step(self, verbose=False):
         """Advances the state to the next time point by both accounting for
         virus spreading within a reigon and transfers by commuting
@@ -144,39 +171,15 @@ class Simulator:
 
             # skip regions with no people as people are only transfer from
             # the region
-            if (region_sir.total_pop == 0 and
-               prev_region_sir.total_pop == 0):
+            if (region_sir.total_pop == 0 and prev_region_sir.total_pop == 0):
                 continue
 
-            # for each neighbour compute a transfer of s, i and r
-            shuffled_neighbours = random.sample(
-                region.neighbors, len(region.neighbors)
-            )
-            for neighbour_region in shuffled_neighbours:
-                # Find sir objects
-                neighbour_id = neighbour_region.id
-                neighbour_sir = self.state.region_sir[neighbour_id]
-                prev_neighbour_sir = prev_state.region_sir[neighbour_id]
+            # get connected sir objects, the result is a list of pairs of
+            # mutable and immutable sir objects for both neighbour and
+            # airlines
+            neighbors_sir = self._get_neighbours_sir(region, prev_state)
+            airlines_sir = self._get_airlines_sir(region, prev_state)
+            sir = neighbors_sir + airlines_sir
 
-                # Transfer from region to neighbour
-                self._transfer_sir(
-                    region_sir, neighbour_sir,
-                    prev_region_sir, prev_neighbour_sir
-                )
-
-            # for each airline route compute transfer of s, i and r
-            # remember region.airlines is a list of Route
-            shuffled_airlines = random.sample(
-                region.airlines, len(region.airlines)
-            )
-            for route in shuffled_airlines:
-                # Find sir objects
-                neighbour_id = route.destination.id
-                neighbour_sir = self.state.region_sir[neighbour_id]
-                prev_neighbour_sir = prev_state.region_sir[neighbour_id]
-
-                # Transfer from region to neighbour
-                self._transfer_sir(
-                    region_sir, neighbour_sir,
-                    prev_region_sir, prev_neighbour_sir
-                )
+            # Transfer from region to neighbour
+            self._transfer_sir(SirPair(region_sir, prev_region_sir), sir)

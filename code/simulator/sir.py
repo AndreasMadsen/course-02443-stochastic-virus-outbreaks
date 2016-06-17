@@ -1,7 +1,8 @@
 
 class SIR:
 
-    def __init__(self, susceptible, infected, removed):
+    def __init__(self, susceptible, infected, removed, region_id=None):
+        self.region_id = region_id
         self.susceptible = susceptible
         self.infected = infected
         self.removed = removed

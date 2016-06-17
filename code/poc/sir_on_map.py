@@ -13,16 +13,17 @@ if __name__ == "__main__":
         plt.figure()
     for i in range(0, 1):
         print('run {0:d}'.format(i))
-        state = State(regions, routes)
-        state.set_outbreak('Paris', 1000)
-        sim = Simulator(state, transfer_prob=0.005, verbose=True)
+        state = State(regions, routes, verbose=True)
+        state.set_outbreak('Sidney', 1000)
+        sim = Simulator(state, transfer_prob=0.001, verbose=True)
 
         sol = []
         for state in sim.run(iterations=365):
-            sol.append(state.total_sir().as_tuple(total=True))
-            #sol.append(state.region_sir[4029].as_tuple(total=True))
+            #sol.append(state.total_sir().as_tuple(total=True))
+            sol.append(state.region_sir[4029].as_tuple(total=True))
 
         sol = np.asarray(sol)
+
 
         if DO_PLOT:
             p1, = plt.plot(sol[:, 0], color='SteelBlue', alpha=0.5, label='Susceptible')

@@ -15,7 +15,7 @@ class State:
 
         self.region_sir = dict()
         for region in regions.values():
-            self.region_sir[region.id] = SIR(region.population, 0, 0)
+            self.region_sir[region.id] = SIR(region.population, 0, 0, region.id)
 
     def _print(self, *msg):
         if self._verbose: print(*msg)
