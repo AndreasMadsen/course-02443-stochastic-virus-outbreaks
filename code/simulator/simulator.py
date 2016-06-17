@@ -3,18 +3,27 @@
 import time
 import numpy as np
 import random
+import textwrap
+
+from ._time_left import TimeLeft
 
 class Simulator:
     """CLass used for simulating compartmentalized SIR models
     """
-    def __init__(self, init_state, beta=0.1, gamma=0.01, transfer_prob=0.005):
+    def __init__(self, init_state,
+                 beta=0.1, gamma=0.01, transfer_prob=0.005,
+                 verbose=False):
         self.state = init_state.copy()
         self.beta = beta
         self.gamma = gamma
         self.transfer_prob = transfer_prob
 
-    # @profile
-    def run(self, iterations=365, verbose=False):
+        self._verbose = verbose
+
+    def _print(self, *msg):
+        if (self._verbose): print(*msg)
+
+    def run(self, iterations=365):
         """
         run n simulation iterations from the current state
 
@@ -28,103 +37,92 @@ class Simulator:
         key-value pairs (time_step, state)
         """
 
-        # used for moving average time estimate
-        iteration_time_estimate = 0
         yield self.state.copy()
+
+        estimator = TimeLeft(iterations)
+
+        # used for moving average time estimate
         for i in range(1, iterations + 1):
-            # start timing
-            start_time = time.time()
-
-            self.step()
-            #state_list = state_list + [self.state.copy()]
-
-            # end timing
-            end_time = time.time()
-            time_diff = end_time - start_time
-
-            # update time estimate
-            if iteration_time_estimate == 0:
-                iteration_time_estimate = time_diff
-            else:
-                iteration_time_estimate = 0.9 * iteration_time_estimate + 0.1 * time_diff
-            time_left = iteration_time_estimate * (iterations - i)
+            (time_usage, time_left) = estimator.run(self.step)
 
             # if verbose print
-            if verbose:
-                print("Iteration {0:d}/{1:d} took {2:.2f} seconds ({3:.2f} seconds left). \
-                Infected={4:d} ".format(
-                    i, iterations, time_diff, time_left,
-                    self.state.total_sir().as_tuple()[1]))
+            self._print(textwrap.dedent("""\
+            Iteration {0:d}/{1:d} took {2:.2f} sec ({3:.2f} sec left)
+                {4:s}
+            """).format(
+                i, iterations,
+                time_usage, time_left,
+                str(self.state.total_sir())
+            ))
 
             yield self.state.copy()
 
-
-    # @profile
     def update_single_region(self, region_sir):
         """Spreads the virus and updates removed within region
         """
         n_people = region_sir.total_pop
 
+        # If there are 0 people, nothing is changed
+        if n_people == 0: return
+
         # the virus spreads:
         new_infected = np.random.binomial(
             region_sir.susceptible,
             self.beta * region_sir.infected / n_people)
-        #region_sir.inc_infected(new_infected)
-        region_sir.infected += new_infected
-        region_sir.susceptible -= new_infected
-
+        region_sir.inc_infected(new_infected)
 
         # some people are curred:
         new_curred = np.random.binomial(
             region_sir.infected, self.gamma)
-        #region_sir.inc_removed(new_curred)
-        region_sir.removed += new_curred
-        region_sir.infected -= new_curred
+        region_sir.inc_removed(new_curred)
 
-    # @profile
-    @classmethod
-    def transfer_between_regions(cls, region_sir_from, region_sir_to, transfer_prob,
-                                 previous_region_from):
+    def _transfer_sir(self,
+                      sir_from, sir_to,
+                      prev_sir_from, prev_sir_to):
         """transfers people from from_region to to_region
         Assumes that S/I/R classes share the same travel frequency
 
         Parameters
         ----------
-        region_sir_from : SIR-object which acts as transfer source
-        region_sir_to : SIR-object which acts as transfer target
-        transfer_prob : probability of transfer in Bin(n, p)
-        previous_region_from : immutable SIR-object representing the transfer \
-          source before any transfers occurred. This is needed to try to ensure \
-          that the sequence in which regions are processed has minimal effect
+        sir_from : SIR-object which acts as transfer source
+        sir_to : SIR-object which acts as transfer target
 
         Returns
         -------
         None : mutates from and to regions
-
         """
+        # Nothing can be transfered stop early
+        if (sir_from.total_pop == 0): return
 
-        n_people = previous_region_from.total_pop
+        # Calculate transfer properbility
+        relative_pop = prev_sir_to.total_pop / (
+            prev_sir_to.total_pop + prev_sir_from.total_pop
+        )
+        properbility = self.transfer_prob * relative_pop
+
         # total number of people to transfer from a to b
-        total_transfer = np.random.binomial(n_people, transfer_prob)
-        # let p = total_transfer / n_people
-        # s_transfer = floor(region.susceptible * p)
-        # to speed up with do the above with:
-        # (region_susceptible * total_transfer) div n_people
-        s_transfer = (previous_region_from.susceptible * total_transfer) // n_people
-        i_transfer = (previous_region_from.infected * total_transfer) // n_people
+        n_people = prev_sir_from.total_pop
+        total_transfer = np.random.binomial(n_people, properbility)
+
+        # This calculates
+        #   p = total_transfer / n_people
+        #   s_transfer = floor(region.susceptible * p)
+        # but avoids floats for speed
+        s_transfer = (prev_sir_from.susceptible * total_transfer) // n_people
+        i_transfer = (prev_sir_from.infected * total_transfer) // n_people
         r_transfer = total_transfer - s_transfer - i_transfer
 
         # check that we are not transferring more people than available
-        if s_transfer > region_sir_from.susceptible or \
-          i_transfer > region_sir_from.infected or \
-          r_transfer > region_sir_from.removed:
-            s_transfer = min(s_transfer, region_sir_from.susceptible)
-            i_transfer = min(i_transfer, region_sir_from.infected)
-            r_transfer = min(r_transfer, region_sir_from.removed)
+        if (s_transfer > sir_from.susceptible or
+           i_transfer > sir_from.infected or
+           r_transfer > sir_from.removed):
+            s_transfer = min(s_transfer, sir_from.susceptible)
+            i_transfer = min(i_transfer, sir_from.infected)
+            r_transfer = min(r_transfer, sir_from.removed)
 
         # increment/decrement counters
-        region_sir_from.transfer_from(s_transfer, i_transfer, r_transfer)
-        region_sir_to.transfer_to(s_transfer, i_transfer, r_transfer)
+        sir_from.transfer_from(s_transfer, i_transfer, r_transfer)
+        sir_to.transfer_to(s_transfer, i_transfer, r_transfer)
 
     # @profile
     def step(self, verbose=False):
@@ -135,69 +133,50 @@ class Simulator:
 
         # update diseases
         for region in self.state.region_sir.values():
-            if region.total_pop != 0:
-                self.update_single_region(region)
+            self.update_single_region(region)
 
-        # transfer people
-        pre_transfer_state = self.state.copy()
-        for region_id in self.state.regions.keys():
-            region = self.state.regions[region_id]
-            current_region_sir = self.state.region_sir[region_id]
-            pre_current_region_sir = pre_transfer_state.region_sir[region_id]
+        # transfer people from region to neighbours and airline connected
+        # regions
+        prev_state = self.state.copy()
+        for region_id, region in self.state.regions.items():
+            region_sir = self.state.region_sir[region_id]
+            prev_region_sir = prev_state.region_sir[region_id]
 
-
-            # skip regions with no people
-            if current_region_sir.total_pop == 0:
+            # skip regions with no people as people are only transfer from
+            # the region
+            if (region_sir.total_pop == 0 and
+               prev_region_sir.total_pop == 0):
                 continue
 
-
             # for each neighbour compute a transfer of s, i and r
-            shuffled_neighbours = [x for x in region.neighbors]
-            random.shuffle(shuffled_neighbours)
-            for neighbour_region in []:#region.neighbors:#shuffled_neighbours:
+            shuffled_neighbours = random.sample(
+                region.neighbors, len(region.neighbors)
+            )
+            for neighbour_region in shuffled_neighbours:
+                # Find sir objects
+                neighbour_id = neighbour_region.id
+                neighbour_sir = self.state.region_sir[neighbour_id]
+                prev_neighbour_sir = prev_state.region_sir[neighbour_id]
 
-                # check that we still have people left in the region
-                if pre_current_region_sir.total_pop == 0:
-                    # no people left break
-                    break
+                # Transfer from region to neighbour
+                self._transfer_sir(
+                    region_sir, neighbour_sir,
+                    prev_region_sir, prev_neighbour_sir
+                )
 
-                neighbour_sir = self.state.region_sir[neighbour_region.id]
-                pre_neighbour_sir = pre_transfer_state.region_sir[neighbour_region.id]
-                if pre_neighbour_sir.total_pop < 0:
-                    print(pre_neighbour_sir.total_pop)
-                Simulator.transfer_between_regions(
-                    current_region_sir, neighbour_sir,
-                    pre_neighbour_sir.total_pop /
-                    (pre_neighbour_sir.total_pop + pre_current_region_sir.total_pop)
-                    * self.transfer_prob, pre_current_region_sir)
-
-            # for each airline route compute transfer of s, i and raise
+            # for each airline route compute transfer of s, i and r
             # remember region.airlines is a list of Route
-
-            n_routes = len(region.airlines)
-            shuffled_airlines = [x for x in region.airlines]
-            random.shuffle(shuffled_airlines)
+            shuffled_airlines = random.sample(
+                region.airlines, len(region.airlines)
+            )
             for route in shuffled_airlines:
-                # check that we still have people left in the region
-                if current_region_sir.total_pop == 0:
-                    # no people left to distribute break
-                    break
+                # Find sir objects
+                neighbour_id = route.destination.id
+                neighbour_sir = self.state.region_sir[neighbour_id]
+                prev_neighbour_sir = prev_state.region_sir[neighbour_id]
 
-                neighbour_sir = self.state.region_sir[route.destination.id]
-                pre_neighbour_sir = pre_transfer_state.region_sir[route.destination.id]
-                #if region_id == 4029:
-                #    print("pre from", current_region_sir,neighbour_sir)
-                #if route.destination.id == 4029:
-                #    print("pre to", current_region_sir,neighbour_sir)
-
-                Simulator.transfer_between_regions(
-                    current_region_sir, neighbour_sir,
-                    pre_neighbour_sir.total_pop /
-                    (pre_neighbour_sir.total_pop + pre_current_region_sir.total_pop)
-                    * self.transfer_prob, pre_current_region_sir)
-
-                #if region_id == 4029:
-                #    print("post from", current_region_sir,neighbour_sir)
-                #if route.destination.id == 4029:
-                #    print("pre to", current_region_sir,neighbour_sir)
-
+                # Transfer from region to neighbour
+                self._transfer_sir(
+                    region_sir, neighbour_sir,
+                    prev_region_sir, prev_neighbour_sir
+                )

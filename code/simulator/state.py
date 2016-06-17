@@ -8,7 +8,8 @@ from .sir import SIR
 class State:
     """ State class representing a multi-compartment sir model
     """
-    def __init__(self, regions, routes, beta=0.1, gamma=0.01):
+    def __init__(self, regions, routes, beta=0.1, gamma=0.01, verbose=False):
+        self._verbose = verbose
         self.regions = regions
         self.routes = routes
 
@@ -16,29 +17,8 @@ class State:
         for region in regions.values():
             self.region_sir[region.id] = SIR(region.population, 0, 0)
 
-    def _print_connection_count(self, city_name):
-        """ Prints the number of ingoing and outgoing connections from a city
-
-        Parameters
-        ---------
-        city_name : string
-
-        Returns
-        -------
-        None : prints output
-        """
-
-        ## use the following
-        region_ids = [x.id for x in self.regions.values() if x.city == city_name]
-        for region_id in region_ids:
-            outgoing_airlines = len(self.regions[region_id].airlines)
-            ingoing_airlines = len([i for i in self.regions \
-                if self.regions[region_id] in \
-                [x.destination for x in self.regions[i].airlines]])
-
-            print("""'{0}' (id={3:d}) had {1:d} outgoing and {2:d}
-             ingoing airline connections""".format(
-                 city_name, outgoing_airlines, ingoing_airlines, region_id))
+    def _print(self, *msg):
+        if self._verbose: print(*msg)
 
     def set_outbreak(self, city, infected, verbose=False):
         """Create an outbreak in the busiest region in the city
@@ -52,11 +32,12 @@ class State:
                     outbreak_region = region
                 elif len(outbreak_region.airlines) < len(region.airlines):
                     outbreak_region = region
-        if verbose:
-            print(
-                "starting outbreak in city '{0}' with id '{1}'".format(
-                    city, outbreak_region.id))
+
         # Create the outbreak
+        self._print("starting outbreak: city = {city}, id = {id}".format(
+            city=city,
+            id=outbreak_region.id
+        ))
         self.region_sir[outbreak_region.id].inc_infected(infected)
 
     def copy(self):
