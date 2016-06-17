@@ -29,8 +29,40 @@ From equation \eqref{eq-S} and one \eqref{eq-I} can see that susceptible individ
 	\includegraphics[width= 1.0 \linewidth]{plots/sir_one_region.pdf}
 	\caption{Numerical solution to the nonlinear ODE system defining the SIR model.}
 \end{figure}
+\todo{comment on shape/interpretation of curve}
 
+\subsection{Multi-region SIR}
+Let it now be given that instead of having a single population, one has $K$ populations each with initial $N_k(0), S_k(0), I_k(0)$ and $R_k(0)$. Each of these populations have a probability of transferring individuals to other populations regardless of whether the individual is susceptible, infected or recovered. The governing equations are modified to add the transfers and become
+\begin{align}
+\frac{d S_k(t)}{dt} &= - \frac{\beta}{N} I(t) S(t) + \sum_{i\in K} \left( S_i(t)\tau_{i,k} - s_k(t)\tau_{k, i}\right)   &\forall k\\
+\frac{d I_k(t)}{dt} &= \frac{\beta}{N} I(t) S(t) - \gamma I(t) + \sum_{i\in K} \left( I_i(t)\tau_{i,k} - I_k(t)\tau_{k, i}\right)  &\forall k\\
+\frac{d R_k(t)}{dt} &= \gamma I(t) + \sum_{i\in K} \left( R_i(t)\tau_{i,k} - R_k(t)\tau_{k, i}\right) &\forall k
+\end{align}
+, where $\tau_{i,j}$ is the infinitesimal probability of transferring from population $i$ to $j$ per individual. 
 
+As an example of the above system let $K=3$ and the non zero transfer probabilities be defined by the graph:
+\begin{figure}[H]
+	\centering
+\begin{tikzpicture}
 
+\def \n {3}
+\def \radius {2cm}
+\def \margin {12} % margin in angles, depends on the radius
 
-\subsection{Multi-compartment SIR}
+\foreach \s in {1,...,\n}
+{
+	\node[draw, circle] at ({360/\n * (\s - 1)}:\radius) {$\s$};
+	\draw[->, >=latex] ({360/\n * (\s - 1)+\margin}:\radius) 
+	arc ({360/\n * (\s - 1)+\margin}:{360/\n * (\s)-\margin}:\radius);
+}
+\end{tikzpicture}
+\end{figure}
+. Solving this system numerically with the outbreak starting in region 1 one gets the following curves
+\begin{figure}[H]
+	\centering
+	\includegraphics[width= 1.0 \linewidth]{plots/sir_three_region.pdf}
+	\caption{Numerical solution to the nonlinear ODE system defining a 3-region SIR model.}
+\end{figure}
+. From the above plot we see that the virus first spreads fast in region 1. After a certain time a enough infected individuals have been transferred to region 2 where the infection then accelerates. This continues to region 3. 
+
+\subsection{}

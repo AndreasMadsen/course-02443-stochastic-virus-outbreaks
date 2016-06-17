@@ -8,7 +8,7 @@ N = 100
 beta = 0.1
 gamma = 0.01
 
-
+# Y=(S_1, I_1, R_1)
 def solver(Y, t):
     return [- beta / N * Y[1] * Y[0],
             beta / N * Y[1] * Y[0] - gamma * Y[1],
