@@ -17,7 +17,7 @@ class WorldMap:
                  continent_color='coral', water_color='aqua'):
 
         # Setup figure and basemap
-        self.fig, self.ax = plt.subplots()
+        self.fig, self.ax = plt.subplots(figsize=(20,14))
         self.map = Basemap(projection=projection, llcrnrlat=-90, urcrnrlat=90,
                            llcrnrlon=-180, urcrnrlon=180, lat_ts=20,
                            resolution=resolution, ax=self.ax)
