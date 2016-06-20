@@ -33,15 +33,12 @@ def sample_dirichlet(p_list, n):
     p_list : properbility in a binomial context for getting a person
     n : population size
     """
-    if len(p_list) == 0:
-        return []
-
-    if sum(p_list) > 1:
+    alpha = np.fromiter(_calc_alpha(p_list, n), dtype='float')
+    if alpha[-1] < 0:
         raise ValueError('sum of p_list excited 1, sum = %f' % sum(p_list))
 
-    alpha = np.fromiter(_calc_alpha(p_list, n), dtype='float')
     parts = scipy.stats.dirichlet.rvs(alpha)[0]
-    people = (parts * n).astype('int').tolist()
+    people = (parts * n).astype(int).tolist()
 
     # Setup a people list with zeros, in case the properbility was zero
     people_zero = []
