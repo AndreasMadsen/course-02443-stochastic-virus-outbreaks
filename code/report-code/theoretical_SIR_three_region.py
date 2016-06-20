@@ -1,8 +1,14 @@
 """ Plots the theoretical SIR curve """
 
+import sys
+import os.path as path
+
 import numpy as np
 from scipy import integrate
 import matplotlib.pyplot as plt
+
+thisdir = path.dirname(path.realpath(__file__))
+sys.path.append(path.join(thisdir, "../"))
 
 N_1 = 50
 N_2 = 50
@@ -46,14 +52,14 @@ plt.plot(t, asol[:, 6], ls='--', color='g')
 plt.plot(t, asol[:, 7], ls='--', color='r')
 plt.plot(t, asol[:, 8], ls='--', color='b')
 
-plt.legend(["S_1", "I_1", "R_1",
-            "S_2", "I_2", "R_2",
-            "S_3", "I_3", "R_3"], loc=7)
+plt.legend(["Susceptible 1", "Infected 1", "Recovered 1",
+            "Susceptible 2", "Infected 2", "Recovered 2",
+            "Susceptible 3", "Infected 3", "Recovered 3"], loc=7)
 plt.title("Theorical SIR 3 regions. N_k={0:d}, Beta={1:.2f}, Gamma={2:.2f}, tau =1e-4".format(
     N_2, beta, gamma
 ))
 plt.xlabel("Time")
 plt.ylabel("# of individuals")
 #plt.show()
-plt.savefig('sir_three_region.pdf', format='pdf',
-            dpi=1000, bbox_inches='tight')
+plt.savefig(path.join(thisdir, '../../report/plots/sir_three_region.pdf'),
+            format='pdf', dpi=1000, bbox_inches='tight')
