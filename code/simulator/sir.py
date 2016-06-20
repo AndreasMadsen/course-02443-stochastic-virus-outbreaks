@@ -120,5 +120,14 @@ class SIR:
         self.infected -= rem_i
         self.removed -= rem_r
         self.total_pop -= rem_s + rem_i + rem_r
+        if self.susceptible < 0:
+            raise ValueError('s %d' % self.susceptible)
+
+        if self.infected < 0:
+            raise ValueError('i %d' % self.infected)
+
+        if self.removed < 0:
+            raise ValueError('r %d' % self.removed)
+
         if self.total_pop < 0:
             raise Exception("total population < 0 after transferring from region")
