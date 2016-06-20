@@ -69,6 +69,9 @@ class Simulator:
         # If there are 0 people, nothing is changed
         if n_people == 0: return
 
+        if region_sir.infected / n_people > 1:
+            print(region_sir.infected, n_people)
+
         # the virus spreads:
         new_infected = np.random.binomial(
             region_sir.susceptible,
@@ -82,12 +85,13 @@ class Simulator:
 
     def _calculate_transfer_probabilities(self, from_sir, connected_sir):
         probability = []
+        n_connections = len(connected_sir)
         for to_sir in connected_sir:
             # Calculate transfer properbility
             relative_pop = to_sir.prev.total_pop / (
                 to_sir.prev.total_pop + from_sir.prev.total_pop
             )
-            probability.append(self.transfer_prob * relative_pop)
+            probability.append(self.transfer_prob * relative_pop / n_connections)
         return probability
 
     def _transfer_sir(self, from_sir, connected_sir):
@@ -112,25 +116,38 @@ class Simulator:
         )
 
         # total number of people to transfer from a to b
-        n_people = from_sir.prev.total_pop
+        from_people = from_sir.prev.total_pop
 
         # get number of people that should be transfered, this guarantees
         # that sum(transfer_people) <= n_people
-        transfer_people = sample_dirichlet(probability, n_people)
+        transfer_people = sample_dirichlet(probability, from_people)
 
         # Transfer people
-        for total_transfer, to_sir in zip(transfer_people, connected_sir):
+        for sample_transfer, to_sir in zip(transfer_people, connected_sir):
+            to_people = to_sir.prev.total_pop
+            transfer = min(sample_transfer, to_sir.prev.total_pop)
+            if transfer == 0: continue
+
             # This calculates
             #   p = total_transfer / n_people
             #   s_transfer = floor(region.susceptible * p)
             # but avoids floats for speed
-            s_transfer = (from_sir.prev.susceptible * total_transfer) // n_people
-            i_transfer = (from_sir.prev.infected * total_transfer) // n_people
-            r_transfer = total_transfer - s_transfer - i_transfer
+            s_send = (from_sir.prev.susceptible * transfer) // from_people
+            i_send = (from_sir.prev.infected * transfer) // from_people
+            r_send = (from_sir.prev.removed * transfer) // from_people
 
             # increment/decrement counters
-            from_sir.current.transfer_from(s_transfer, i_transfer, r_transfer)
-            to_sir.current.transfer_to(s_transfer, i_transfer, r_transfer)
+            from_sir.current.transfer_from(s_send, i_send, r_send)
+            to_sir.current.transfer_to(s_send, i_send, r_send)
+
+            # The other way
+            s_recv = (to_sir.prev.susceptible * transfer) // to_people
+            i_recv = (to_sir.prev.infected * transfer) // to_people
+            r_recv = (to_sir.prev.removed * transfer) // to_people
+
+            # increment/decrement counters
+            to_sir.current.transfer_from(s_recv, i_recv, r_recv)
+            from_sir.current.transfer_to(s_recv, i_recv, r_recv)
 
     def _get_neighbours_sir(self, region, prev_state):
         sir = []
