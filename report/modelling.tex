@@ -33,8 +33,8 @@ From equation \eqref{eq-S} and \eqref{eq-I} one can see that susceptible individ
 \subsection{Multi-region SIR}
 Let it now be given that instead of having a single population, one has $K$ populations each with initial $N_k(0), S_k(0), I_k(0)$ and $R_k(0)$. Each of these populations have a probability of transferring individuals to other populations regardless of whether the individual is susceptible, infected or recovered. The governing equations are modified to add the transfers and become
 \begin{align}
-\frac{d S_k(t)}{dt} &= - \frac{\beta}{N} I(t) S(t) + \sum_{i\in K} \left( S_i(t)\tau_{i,k} - S_k(t)\tau_{k, i}\right)   &\forall k\\
-\frac{d I_k(t)}{dt} &= \frac{\beta}{N} I(t) S(t) - \gamma I(t) + \sum_{i\in K} \left( I_i(t)\tau_{i,k} - I_k(t)\tau_{k, i}\right)  &\forall k\\
+\frac{d S_k(t)}{dt} &= - \frac{\beta}{N_k} I(t) S(t) + \sum_{i\in K} \left( S_i(t)\tau_{i,k} - S_k(t)\tau_{k, i}\right)   &\forall k\\
+\frac{d I_k(t)}{dt} &= \frac{\beta}{N_k} I(t) S(t) - \gamma I(t) + \sum_{i\in K} \left( I_i(t)\tau_{i,k} - I_k(t)\tau_{k, i}\right)  &\forall k\\
 \frac{d R_k(t)}{dt} &= \gamma I(t) + \sum_{i\in K} \left( R_i(t)\tau_{i,k} - R_k(t)\tau_{k, i}\right) &\forall k
 \end{align}
 , where $\tau_{i,j}$ is the infinitesimal probability of transferring from population $i$ to $j$ per individual.
@@ -66,3 +66,22 @@ As an example of the above system let $K=3$ and the non zero transfer probabilit
 From the above plot it's seen that the virus first spreads in region 1. After a certain time a enough infected individuals have been transferred to region 2 where the infection then accelerates. This continues to region 3.
 
 \subsection{}
+
+\subsection{Stocastic Model}
+
+To simulate the multi-region SIR model stochastically, a binomial distribution is used to sample how many people get infected, removed and transferred. The binomial probability is chosen such the expectation is the same, as in the differential equation model.
+\begin{equation*}
+\begin{aligned}
+\Delta I_{k,t} &= \textsc{Binom}\left(S_{k,t}, \beta \frac{I_{k, t}}{N_k}\right) \\
+\Delta R_{k,t} &= \textsc{Binom}\left(I_{k,t}, \gamma\right) \\
+S_{k,t} &= S_{k,t-1} - \Delta I_{k,t} + \sum_{i \in K} \left(\textsc{Binom}(S_{i,t-1}, \tau_{i,k}) - \textsc{Binom}(S_{k,t-1}, \tau_{k,i})\right) \\
+I_{k,t} &= I_{k,t-1} + \Delta I_{k,t} - \Delta R_{k, t} + \sum_{i \in K} \left(\textsc{Binom}(I_{i,t-1}, \tau_{i,k}) - \textsc{Binom}(I_{k,t-1}, \tau_{k,i})\right) \\
+R_{k,t} &= R_{k,t-1} + \Delta R_{k, t} + \sum_{i \in K} \left(\textsc{Binom}(R_{i,t-1}, \tau_{i,k}) - \textsc{Binom}(R_{k,t-1}, \tau_{k,i})\right)
+\end{aligned}
+\end{equation*}
+
+where $\tau_{i,j}$ now is the discretized transfer probability.
+
+A problem with this approach, is the small risk that $\textsc{Binom}(S_{i, t-1}, \tau_{i,k}) = 0$ and $\textsc{Binom}(S_{k, t-1}, \tau_{k,i}) = S_k$ or similar unfortunate combination which will cause $S_{k,t}$ to become negative. This turns out to be a practical problem, to avoid this problem one should sample all the transfers for a region simultaneously such $\sum_{i \in K} \textsc{Binom}(S_{k,t-1}, \tau_{k,i}) \le S_{k, t}$.
+
+As there does not exist a multivariate version of the binomial distribution, the Dirichlet distribution is used as an approximation. This is convenient because $\sum_{i} X_i = 1$ if $\mathbf{X} \sim \textsc{Dir}(\boldsymbol{\alpha})$.
