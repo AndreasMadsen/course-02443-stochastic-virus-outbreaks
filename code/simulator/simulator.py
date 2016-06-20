@@ -69,9 +69,6 @@ class Simulator:
         # If there are 0 people, nothing is changed
         if n_people == 0: return
 
-        if region_sir.infected / n_people > 1:
-            print(region_sir.infected, n_people)
-
         # the virus spreads:
         new_infected = np.random.binomial(
             region_sir.susceptible,
@@ -125,7 +122,7 @@ class Simulator:
         # Transfer people
         for sample_transfer, to_sir in zip(transfer_people, connected_sir):
             to_people = to_sir.prev.total_pop
-            transfer = min(sample_transfer, to_sir.prev.total_pop)
+            transfer = min(sample_transfer, to_sir.prev.total_pop, to_sir.current.total_pop)
             if transfer == 0: continue
 
             # This calculates
@@ -136,6 +133,20 @@ class Simulator:
             i_send = (from_sir.prev.infected * transfer) // from_people
             r_send = (from_sir.prev.removed * transfer) // from_people
 
+            send_transfer_diff = transfer - (s_send + i_send + r_send)
+            while send_transfer_diff > 0:
+                if from_sir.current.susceptible > s_send and send_transfer_diff > 0:
+                    s_send += 1
+                    send_transfer_diff -= 1
+
+                if from_sir.current.infected > i_send and send_transfer_diff > 0:
+                    i_send += 1
+                    send_transfer_diff -= 1
+
+                if from_sir.current.removed > r_send and send_transfer_diff > 0:
+                    r_send += 1
+                    send_transfer_diff -= 1
+
             # increment/decrement counters
             from_sir.current.transfer_from(s_send, i_send, r_send)
             to_sir.current.transfer_to(s_send, i_send, r_send)
@@ -144,6 +155,24 @@ class Simulator:
             s_recv = (to_sir.prev.susceptible * transfer) // to_people
             i_recv = (to_sir.prev.infected * transfer) // to_people
             r_recv = (to_sir.prev.removed * transfer) // to_people
+
+            s_recv = min(s_recv, to_sir.current.susceptible)
+            i_recv = min(i_recv, to_sir.current.infected)
+            r_recv = min(r_recv, to_sir.current.removed)
+
+            recv_transfer_diff = transfer - (s_recv + i_recv + r_recv)
+            while recv_transfer_diff > 0:
+                if to_sir.current.susceptible > s_recv and recv_transfer_diff > 0:
+                    s_recv += 1
+                    recv_transfer_diff -= 1
+
+                if to_sir.current.infected > i_recv and recv_transfer_diff > 0:
+                    i_recv += 1
+                    recv_transfer_diff -= 1
+
+                if to_sir.current.removed > r_recv and recv_transfer_diff > 0:
+                    r_recv += 1
+                    recv_transfer_diff -= 1
 
             # increment/decrement counters
             to_sir.current.transfer_from(s_recv, i_recv, r_recv)
