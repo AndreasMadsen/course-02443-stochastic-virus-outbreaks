@@ -35,7 +35,17 @@ asol = integrate.odeint(solver, [N_1 - start_infection_n1,
                                  0,
                                  0], t)
 plt.figure(figsize=(12, 8))
-plt.plot(t, asol)
+
+plt.plot(t, asol[:, 0], ls='-', color='g')
+plt.plot(t, asol[:, 1], ls='-', color='r')
+plt.plot(t, asol[:, 2], ls='-', color='b')
+plt.plot(t, asol[:, 3], ls=':', color='g')
+plt.plot(t, asol[:, 4], ls=':', color='r')
+plt.plot(t, asol[:, 5], ls=':', color='b')
+plt.plot(t, asol[:, 6], ls='--', color='g')
+plt.plot(t, asol[:, 7], ls='--', color='r')
+plt.plot(t, asol[:, 8], ls='--', color='b')
+
 plt.legend(["S_1", "I_1", "R_1",
             "S_2", "I_2", "R_2",
             "S_3", "I_3", "R_3"], loc=7)
@@ -44,6 +54,6 @@ plt.title("Theorical SIR 3 regions. N_k={0:d}, Beta={1:.2f}, Gamma={2:.2f}, tau 
 ))
 plt.xlabel("Time")
 plt.ylabel("# of individuals")
-plt.show()
-#plt.savefig('sir_three_region.pdf', format='pdf',
-#            dpi=1000, bbox_inches='tight')
+#plt.show()
+plt.savefig('sir_three_region.pdf', format='pdf',
+            dpi=1000, bbox_inches='tight')
