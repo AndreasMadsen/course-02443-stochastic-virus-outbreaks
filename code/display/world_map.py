@@ -51,6 +51,36 @@ class WorldMap:
         x, y = self.map(longitudes, latitudes)
         self.map.scatter(x, y, zorder=2, s=2, lw=0, c='k')
 
+    def add_airport_connections(self, regions):
+        """ Adds connections between airports on the map
+
+        Parameters
+        ---------
+        regions : Region dict
+        """
+
+        connection_has_been_drawn = set()
+
+        for region in regions.values():
+            for destination in (x.destination for x in region.airlines):
+
+                # Prevent the same connection from being drawn twice
+                edge_id = (region.id, destination.id)
+                if region.id > destination.id:
+                    edge_id = (destination.id, destination.id)
+
+                if edge_id in connection_has_been_drawn:
+                    continue
+
+                connection_has_been_drawn.add(edge_id)
+
+                # Draw connection
+                self.map.drawgreatcircle(
+                    region.longitude, region.latitude,
+                    destination.longitude, destination.latitude,
+                    color='k', ls='--', alpha=0.1)
+
+
     def _infected_rate(self, sir):
         pop = sir.susceptible + sir.infected + sir.removed
         if pop == 0: return 0
@@ -171,3 +201,11 @@ class WorldMap:
             plt.show(self.ani)
         else:
             plt.show()
+
+    def save_fig(self, name):
+        if self.ani is not None:
+            plt.savefig(name, format='pdf',
+                        dpi=1000, bbox_inches='tight')
+        else:
+            plt.savefig(name, format='pdf', dpi=1000,
+                        bbox_inches='tight')
