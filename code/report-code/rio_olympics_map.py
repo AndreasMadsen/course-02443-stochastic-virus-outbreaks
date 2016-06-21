@@ -5,11 +5,11 @@ from simulator import State, Simulator
 from world import regions, routes
 
 state = State(regions, routes, verbose=True)
-state.set_outbreak('Sidney', 1000)
+state.set_outbreak('Rio De Janeiro', 1000)
 
-sim = Simulator(state, transfer_prob=0.005, frames=400)
-
+sim = Simulator(state, transfer_prob=0.005, verbose=True)
+sim.add_event(2560, days=18, total_transfer=380e3)
 # plot regions on a world map
 base_map = WorldMap(resolution="c")
-base_map.animate(sim)
+base_map.animate(sim, )
 base_map.show()

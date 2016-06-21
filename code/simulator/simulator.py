@@ -22,6 +22,7 @@ class Simulator:
         self.gamma = gamma
         self.transfer_prob = transfer_prob
 
+        self.time_to_reverse = None
         self._verbose = verbose
 
     def _print(self, *msg):
@@ -60,6 +61,68 @@ class Simulator:
             ))
 
             yield self.state.copy()
+
+    def add_event(self, id, days=18, total_transfer=380e3):
+        """ Adds an event where people accross the globe are
+        transferred to a region for a specific time period
+
+        Parameters
+        ----------
+        id (int): Id of region hosting event
+        days (int): Number of days that the event should last
+        transfer_amount (int): Number of people to transfer to region
+
+        Returns
+        -------
+        None : Mutates the Simulator object
+        """
+        target_region = self.state.region_sir[id]
+        self.reverse_from_id = id
+        self.reverse_transfer_amount = {}
+        N = sum(self.state.total_sir().as_tuple())
+        for key in self.state.region_sir:
+            if key == id:
+                continue #skip target region
+            from_region = self.state.region_sir[key]
+            total_from = sum(from_region.as_tuple())
+            if total_from == 0:
+                continue #skip, there is nothign to distribute
+            transfer_amount = np.round(total_transfer * total_from / N)
+            self.reverse_transfer_amount[key] = transfer_amount
+
+            send_susceptible = (transfer_amount * from_region.susceptible) // total_from
+            send_infected = (transfer_amount * from_region.infected) // total_from
+            send_removed = (transfer_amount * from_region.removed) // total_from
+
+            from_region.susceptible -= send_susceptible
+            from_region.infected -= send_infected
+            from_region.removed -= send_removed
+
+            target_region.susceptible += send_susceptible
+            target_region.infected += send_infected
+            target_region.removed += send_removed
+
+        self.time_to_reverse = days
+
+    def reverse_event(self):
+        from_region = self.state.region_sir[self.reverse_from_id]
+        for key, transfer_amount in self.reverse_transfer_amount.items():
+            to_region = self.state.region_sir[key]
+
+            total_from = sum(from_region.as_tuple())
+            if total_from == 0:
+                break # nothing left to distribute
+            send_susceptible = (transfer_amount * from_region.susceptible) // total_from
+            send_infected = (transfer_amount * from_region.infected) // total_from
+            send_removed = (transfer_amount * from_region.removed) // total_from
+
+            from_region.susceptible -= send_susceptible
+            from_region.infected -= send_infected
+            from_region.removed -= send_removed
+
+            to_region.susceptible += send_susceptible
+            to_region.infected += send_infected
+            to_region.removed += send_removed
 
     def update_single_region(self, region_sir):
         """Spreads the virus and updates removed within region
@@ -107,7 +170,7 @@ class Simulator:
         None : mutates from and to regions
         """
         # Nothing can be transfered stop early
-        if (from_sir.current.total_pop == 0): return
+        if from_sir.current.total_pop == 0: return
 
         # Calculate transfer probabilities
         probability = self._calculate_transfer_probabilities(
@@ -162,6 +225,13 @@ class Simulator:
         virus spreading within a reigon and transfers by commuting
         to the neighbours and by plane to connected cities
         """
+
+        if self.time_to_reverse is not None:
+            if self.time_to_reverse > 0:
+                self.time_to_reverse -= 1
+            else:
+                self.reverse_event()
+                self.time_to_reverse = None
 
         # update diseases
         for region in self.state.region_sir.values():

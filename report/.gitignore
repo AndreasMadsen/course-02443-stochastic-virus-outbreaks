@@ -6,3 +6,5 @@
 *.synctex.gz
 main.pdf
 *.run.xml
+*.blg
+*.bbl
