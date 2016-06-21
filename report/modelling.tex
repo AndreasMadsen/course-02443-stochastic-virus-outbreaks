@@ -139,3 +139,25 @@ Using this method for choosing $\alpha$, gives the distribution as seen in Figur
 	\label{fig:dirichlet-validation}
 \end{figure}
 
+\subsection{Transfer probabilities}
+
+The GLEaM model \cite{GLEaM} uses a gravity law for transferring people between neighboring regions and airline data for transferring people between airports. Unfortunately the GLEaM paper does not specify all the parameters for the gravity law equation and our airline dataset does not contain the traveling frequency. Instead a much simpler model, where the proportional transfer expectation is fixed to some constant, is used.
+\begin{equation}
+\sum_{i = 1}^{K_k} \tau_{k, i} = p_{transfer}
+\end{equation}
+
+Using an equal transfer probability one gets $\tau_{k, i} = \frac{p_{transfer}}{K_k}$. To ensure that the population doesn't change over time, this value is used to transfer both from $k$ to $i$ and from $i$ to $k$:
+\begin{equation}
+\tau_{k, i} = \frac{p_{transfer}}{K_k} + \frac{p_{transfer}}{K_i} = p_{transfer} \left(\frac{1}{K_k} + \frac{1}{K_i}\right)
+\end{equation}
+
+Finally one should take care, not to transfer more people to the destination than what is already in the destination. To prevent this the transfer probability is scaled with relative population.
+\begin{equation}
+\tau_{k, i} = p_{transfer} \frac{N_i}{N_k + N_i} \left(\frac{1}{K_k} + \frac{1}{K_i}\right)
+\end{equation}
+
+Using transfer probability will maintain the population over time, as the transfer expectation is symmetric:
+\begin{equation}
+\mathbb{E}[N_k \tau_{k, i}] = \mathbb{E}[N_i \tau_{i, k}] \Leftrightarrow N_k \tau_{k, i} = N_i \tau_{i, k}
+\end{equation}
+
