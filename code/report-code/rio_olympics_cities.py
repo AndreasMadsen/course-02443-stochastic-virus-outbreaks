@@ -1,5 +1,6 @@
 import _setup
 
+import os.path as path
 import numpy as np
 import scipy.stats
 import matplotlib.pyplot as plt
@@ -7,6 +8,7 @@ import matplotlib.pyplot as plt
 from simulator import State, Simulator
 from world import regions, routes
 
+this_dir = path.dirname(path.realpath(__file__))
 
 def plot_sir(sols, names, fig_name):
     n = len(sols)
@@ -31,14 +33,16 @@ def plot_sir(sols, names, fig_name):
         p4, = plt.plot(sol[:, 3], color='Gray', alpha=0.5, label='Total')
         plt.legend([p1, p2, p3, p4], ['S', 'I', 'R', 'T'])
 
-    plt.savefig(fig_name, format='pdf', dpi=1000, bbox_inches='tight')
+    plt.savefig(path.join(this_dir, '../../report/plots/' + fig_name),
+                format='pdf', dpi=1000, bbox_inches='tight')
 
 
 def execute_simulation(add_rio=False, rio_start=0, rio_length=18,
                        rio_visitors=380e3):
     state = State(regions, routes, verbose=True)
     state.set_outbreak('Rio De Janeiro', 1e3)#'Rio De Janeiro', 1000)
-    sim = Simulator(state, transfer_prob=0.005, verbose=True)
+    sim = Simulator(state, transfer_prob=0.005, beta=2, gamma=0.5,
+                    verbose=True)
 
 
     sol_rio = []
@@ -47,7 +51,7 @@ def execute_simulation(add_rio=False, rio_start=0, rio_length=18,
     sol_beijing = []
     sol_sydney = []
     sol_new_york = []
-    for i, state in enumerate(sim.run(iterations=365)):
+    for i, state in enumerate(sim.run(iterations=180)):
         if i == rio_start and add_rio: # start outbreak x days before olympics
             sim.add_event(2560, days=rio_length, total_transfer=rio_visitors)
 
@@ -59,8 +63,8 @@ def execute_simulation(add_rio=False, rio_start=0, rio_length=18,
         sol_new_york.append(state.region_sir[3797].as_tuple(total=True))
 
     if add_rio:
-        fig_name = "rio-{0}-{1}-{2}.pdf".format(rio_start, rio_length,
-                                                rio_visitors)
+        fig_name = "rio-{0}-{1}-{2:d}.pdf".format(rio_start, rio_length,
+                                                int(rio_visitors))
     else:
         fig_name = "no_rio.pdf"
 
