@@ -61,3 +61,16 @@ for routes_raw in csv.DictReader(open(routes_csv), dialect='unix'):
         routes[route.route_id].add_route(route)
     else:
         routes[route.route_id] = route
+
+    route = Route({
+        'airline_id': routes_raw['airline_id'],
+        'source_airport_id': routes_raw['destination_airport_id'],
+        'destination_airport_id': routes_raw['source_airport_id']
+    })
+    if not route.real_route:
+        continue
+
+    if route.route_id in routes:
+        routes[route.route_id].add_route(route)
+    else:
+        routes[route.route_id] = route

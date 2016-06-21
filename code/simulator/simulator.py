@@ -9,7 +9,7 @@ import collections
 from ._time_left import TimeLeft
 from ._dirichlet_sampler import sample_dirichlet
 
-SirPair = collections.namedtuple('SirPair', ['current', 'prev'])
+SirPair = collections.namedtuple('SirPair', ['current', 'prev', 'region'])
 
 class Simulator:
     """CLass used for simulating compartmentalized SIR models
@@ -88,7 +88,9 @@ class Simulator:
             relative_pop = to_sir.prev.total_pop / (
                 to_sir.prev.total_pop + from_sir.prev.total_pop
             )
-            probability.append(self.transfer_prob * relative_pop / n_connections)
+            to_connections = len(to_sir.region.airlines) + len(to_sir.region.neighbors)
+            neighbors_factor = (to_connections + n_connections) / (to_connections * n_connections)
+            probability.append(self.transfer_prob * neighbors_factor * relative_pop)
         return probability
 
     def _transfer_sir(self, from_sir, connected_sir):
@@ -121,62 +123,19 @@ class Simulator:
 
         # Transfer people
         for sample_transfer, to_sir in zip(transfer_people, connected_sir):
-            to_people = to_sir.prev.total_pop
-            transfer = min(sample_transfer, to_sir.prev.total_pop, to_sir.current.total_pop)
-            if transfer == 0: continue
+            if sample_transfer == 0: continue
 
             # This calculates
             #   p = total_transfer / n_people
             #   s_transfer = floor(region.susceptible * p)
             # but avoids floats for speed
-            s_send = (from_sir.prev.susceptible * transfer) // from_people
-            i_send = (from_sir.prev.infected * transfer) // from_people
-            r_send = (from_sir.prev.removed * transfer) // from_people
-
-            send_transfer_diff = transfer - (s_send + i_send + r_send)
-            while send_transfer_diff > 0:
-                if from_sir.current.susceptible > s_send and send_transfer_diff > 0:
-                    s_send += 1
-                    send_transfer_diff -= 1
-
-                if from_sir.current.infected > i_send and send_transfer_diff > 0:
-                    i_send += 1
-                    send_transfer_diff -= 1
-
-                if from_sir.current.removed > r_send and send_transfer_diff > 0:
-                    r_send += 1
-                    send_transfer_diff -= 1
+            s_send = (from_sir.prev.susceptible * sample_transfer) // from_people
+            i_send = (from_sir.prev.infected * sample_transfer) // from_people
+            r_send = (from_sir.prev.removed * sample_transfer) // from_people
 
             # increment/decrement counters
             from_sir.current.transfer_from(s_send, i_send, r_send)
             to_sir.current.transfer_to(s_send, i_send, r_send)
-
-            # The other way
-            s_recv = (to_sir.prev.susceptible * transfer) // to_people
-            i_recv = (to_sir.prev.infected * transfer) // to_people
-            r_recv = (to_sir.prev.removed * transfer) // to_people
-
-            s_recv = min(s_recv, to_sir.current.susceptible)
-            i_recv = min(i_recv, to_sir.current.infected)
-            r_recv = min(r_recv, to_sir.current.removed)
-
-            recv_transfer_diff = transfer - (s_recv + i_recv + r_recv)
-            while recv_transfer_diff > 0:
-                if to_sir.current.susceptible > s_recv and recv_transfer_diff > 0:
-                    s_recv += 1
-                    recv_transfer_diff -= 1
-
-                if to_sir.current.infected > i_recv and recv_transfer_diff > 0:
-                    i_recv += 1
-                    recv_transfer_diff -= 1
-
-                if to_sir.current.removed > r_recv and recv_transfer_diff > 0:
-                    r_recv += 1
-                    recv_transfer_diff -= 1
-
-            # increment/decrement counters
-            to_sir.current.transfer_from(s_recv, i_recv, r_recv)
-            from_sir.current.transfer_to(s_recv, i_recv, r_recv)
 
     def _get_neighbours_sir(self, region, prev_state):
         sir = []
@@ -185,7 +144,7 @@ class Simulator:
             neighbour_sir = self.state.region_sir[neighbour_id]
             prev_neighbour_sir = prev_state.region_sir[neighbour_id]
 
-            sir.append(SirPair(neighbour_sir, prev_neighbour_sir))
+            sir.append(SirPair(neighbour_sir, prev_neighbour_sir, self.state.regions[neighbour_id]))
         return sir
 
     def _get_airlines_sir(self, region, prev_state):
@@ -195,7 +154,7 @@ class Simulator:
             neighbour_sir = self.state.region_sir[neighbour_id]
             prev_neighbour_sir = prev_state.region_sir[neighbour_id]
 
-            sir.append(SirPair(neighbour_sir, prev_neighbour_sir))
+            sir.append(SirPair(neighbour_sir, prev_neighbour_sir, self.state.regions[neighbour_id]))
         return sir
 
     def step(self, verbose=False):
@@ -228,4 +187,4 @@ class Simulator:
             sir = neighbors_sir + airlines_sir
 
             # Transfer from region to neighbour
-            self._transfer_sir(SirPair(region_sir, prev_region_sir), sir)
+            self._transfer_sir(SirPair(region_sir, prev_region_sir, region), sir)
