@@ -1,0 +1,26 @@
+%!TEX root = main.tex
+\section{Simulation}
+\subsection{Variance reduction}
+Because the simulation can be time consuming to run we want to lower the variance of the estimated parameters as much as possible relative to the computational resources used. 
+
+\subsubsection{Control Variates}
+Control variates is a variance reduction technique which can be used to reduce the variance of the estimated expected value $\hat{\mu} =E[Y]$. It works by drawing a variable $x_i$ such that $Y_i \approx f(x_i)$. One can then estimate $\hat{\mu} =E[Z]$ where $Z$ is given by
+
+\begin{align}
+Z_i = Y_i - c (X_i - E[X]) 
+\end{align}
+
+. Choosing $c = \dfrac{Cov(X, Y)}{Var(X)}$ we expect a variance reduction of
+
+\begin{equation}
+\frac{Var(E[Z])}{Var(E[Y])} = \frac{ Var(\frac{1}{N} \sum_i Z_i) }{ Var(\frac{1}{N} \sum_i Y_i )} = 1 - \rho_{x, y}^2
+\end{equation}
+
+. Since we don't have analytical expressions for the covariance or variance of our random variables we will use the approach of
+
+\begin{enumerate}
+	\item Draw $N_0$ samples $(X_{0,i}, Y_{0, i})$ and calculate $\hat{c}$
+	\item Draw $N$ samples $(X_i, Y_i)$ and estimate $E[Z] = \frac{1}{N} \sum_i \left( Y_i - \hat{c} (X_i - \frac{1}{N}\sum_i X_i) \right)  $
+\end{enumerate}
+
+.

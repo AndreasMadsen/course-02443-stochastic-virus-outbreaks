@@ -15,12 +15,12 @@ if __name__ == "__main__":
         print('run {0:d}'.format(i))
         state = State(regions, routes, verbose=True)
         state.set_outbreak('Sidney', 1000)
-        sim = Simulator(state, transfer_prob=0.001, verbose=True)
+        sim = Simulator(state, transfer_prob=0.005, beta=2, gamma=0.5, verbose=True)
 
         sol = []
-        for state in sim.run(iterations=365):
-            #sol.append(state.total_sir().as_tuple(total=True))
-            sol.append(state.region_sir[4029].as_tuple(total=True))
+        for state in sim.run(iterations=120):
+            sol.append(state.total_sir().as_tuple(total=True))
+            #sol.append(state.region_sir[4029].as_tuple(total=True))
 
         sol = np.asarray(sol)
 
