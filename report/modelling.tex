@@ -82,6 +82,60 @@ R_{k,t} &= R_{k,t-1} + \Delta R_{k, t} + \sum_{i \in K} \left(\textsc{Binom}(R_{
 
 where $\tau_{i,j}$ now is the discretized transfer probability.
 
+\subsubsection{Transfer using Dirichlet distribution}
 A problem with this approach, is the small risk that $\textsc{Binom}(S_{i, t-1}, \tau_{i,k}) = 0$ and $\textsc{Binom}(S_{k, t-1}, \tau_{k,i}) = S_k$ or similar unfortunate combination which will cause $S_{k,t}$ to become negative. This turns out to be a practical problem, to avoid this problem one should sample all the transfers for a region simultaneously such $\sum_{i \in K} \textsc{Binom}(S_{k,t-1}, \tau_{k,i}) \le S_{k, t}$.
 
-As there does not exist a multivariate version of the binomial distribution, the Dirichlet distribution is used as an approximation. This is convenient because $\sum_{i} X_i = 1$ if $\mathbf{X} \sim \textsc{Dir}(\boldsymbol{\alpha})$.
+As there does not exist a multivariate version of the binomial distribution, the Dirichlet distribution is used as an approximation. This is convenient because $\sum_{i} X_{i,k} = 1$ if $\mathbf{X}_k \sim \textsc{Dir}(\boldsymbol{\alpha}_k)$. Because the Dirichlet distribution has support $X_i \in [0, 1]$, $\floor*{N_k X_{i,k}}$ is used.
+
+Furthermore to reduced the amount of sampling, the total transfer $T$ is sampled instead of sampling $S$, $I$ and $R$ independently.
+
+To approximate the binomial distribution using a Dirichlet distribution the expectation is set to be the same. To simplify notation region $k$ is omitted from the subscript and the summarization of $tau_k$ and $\alpha_i$ is introduced:
+\begin{equation}
+\tau_s = \sum_{k = 1}^{K} \tau_k, \quad \alpha_s = \sum_{k = 1}^{K+1} \tau_k
+\end{equation}
+
+\begin{equation}
+\mathbb{E}[T_{i}] = \mathbb{E}[N X_i] \Leftrightarrow N \tau_i = N \frac{\alpha_i}{\alpha_s} \quad \forall i \in K
+\label{dir-expected-trans}
+\end{equation}
+
+To allow $\sum_{i} X_{i,k} \le 1$ the Dirichlet distribution is extended with another variable $X_{k, K+1}$, which will be how large a proportion region $k$ should keep.
+\begin{equation}
+\mathbb{E}[T_{K+1}] = \mathbb{E}[N X_{K+1}] \Leftrightarrow N \left(1 - \tau_s\right) = N \frac{\alpha_{K+1}}{\alpha_s}
+\label{dir-expected-stay}
+\end{equation}
+  
+This is a linear system with n variables and n equations, but it turns out not to have full rank. To add another equation the variance of $T_{K+1}$ is also set to be the same.
+\begin{equation}
+\textsc{Var}[T_{K+1}] = \textsc{Var}[N X_{K+1}] \Leftrightarrow N\tau_s (1 - \tau_s) = N^2 \frac{\alpha_{K+1}(\alpha_s - \alpha_{K+1})}{\alpha_s^2 (\alpha_s + 1)}
+\label{dir-var}
+\end{equation}
+
+The trick to solving this set of equations, is to isolate $\alpha_s$ from \eqref{dir-expected-stay} and insert it into \eqref{dir-expected-trans} and \eqref{dir-var}.
+\begin{align}
+\alpha_s &= \frac{\alpha_{K+1}}{1 - \tau_s} \label{dir-expected-intermediate} \\
+N \tau_i &= N \frac{\alpha_i}{\frac{\alpha_{K+1}}{1 - \tau_s}} \quad \forall i \in K \\
+N\tau_s (1 - \tau_s) &= N^2 \frac{\alpha_{K+1}\left(\frac{\alpha_{K+1}}{1 - \tau_s} - \alpha_{K+1}\right)}{\left(\frac{\alpha_{K+1}}{1 - \tau_s}\right)^2 \left(\frac{\alpha_{K+1}}{1 - \tau_s} + 1\right)} \label{dir-var-intermediate}
+\end{align}
+
+$\alpha_{K+1}$ can now be isolated from \eqref{dir-var-intermediate} yielding
+\begin{equation}
+\alpha_{K+1} = (N - 1) - \tau_s (N - 1)
+\end{equation}
+, inserting this into \eqref{dir-expected-intermediate} gives:
+\begin{equation}
+\alpha_{i} = \tau_i (N - 1)
+\end{equation}
+Using the $\alpha_{i}$ solution $\alpha_{K+1}$ can now be reformulated as
+\begin{equation}
+\alpha_{K+1} = (N - 1) - \sum_{i=1}^K \alpha_k
+\end{equation}
+which is computationally slightly more convenient.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width= 1.0 \linewidth]{plots/dirichlet-validation}
+	\caption{A dirichlet distribution  upscaled by $N$, with $\tau = (0.1, 0.1)$ and $N = 100$. First figure compare the marginal probability $P(\floor*{N X_1})$ with the binomial distribution. Second figure shows the Dirichlet pdf with $X_3 = 1- X_1 - X_2$.}
+\end{figure}
+
+

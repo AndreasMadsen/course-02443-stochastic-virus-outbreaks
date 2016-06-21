@@ -27,7 +27,7 @@
 
 %listing settings, æøå support, font config, line number, left lines
 \lstset{
-    breakatwhitespace=false, breaklines=true,
+    breakatwhitespace=false, breaklines=true, 
     inputencoding=utf8, extendedchars=true,
     literate={å}{{\aa}}1 {æ}{{\ae}}1 {ø}{{\o}}1 {Å}{{\AA}}1 {Æ}{{\AE}}1 {Ø}{{\O}}1,
     keepspaces=true, showstringspaces=false, basicstyle=\small\ttfamily,
@@ -46,6 +46,9 @@
 \algnewcommand{\LineComment}[1]{\State \(\triangleright\) #1}
 \algrenewcommand\Call[2]{\textproc{#1}(#2)}
 \algrenewcommand\alglinenumber[1]{{\footnotesize\color{gray}\ttfamily#1}}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 \setlength{\marginparwidth}{80pt} 				% Mere brede på margin notes og to-do
 \setlength{\parindent}{0cm}   					% Deaktiver afsnit indrykning
