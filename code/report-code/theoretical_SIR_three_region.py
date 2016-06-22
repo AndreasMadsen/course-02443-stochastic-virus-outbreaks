@@ -55,7 +55,7 @@ plt.plot(t, asol[:, 8], ls='--', color='b')
 
 plt.legend(["Susceptible 1", "Infected 1", "Recovered 1",
             "Susceptible 2", "Infected 2", "Recovered 2",
-            "Susceptible 3", "Infected 3", "Recovered 3"], loc=7)
+            "Susceptible 3", "Infected 3", "Recovered 3"], loc=7, fontsize=12)
 plt.title("Theoretical SIR 3 regions. beta={0:.2f}, gamma={1:.2f}, tau={2:.0e}".format(
     beta, gamma, transfer_prob
 ))

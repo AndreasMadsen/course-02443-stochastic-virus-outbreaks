@@ -30,8 +30,8 @@ plt.figure(figsize=(12, 8))
 plt.plot(t, asol[:, 0], ls='-', color='g')
 plt.plot(t, asol[:, 1], ls='-', color='r')
 plt.plot(t, asol[:, 2], ls='-', color='b')
-plt.legend(["Susceptible", "Infected", "Recovered"], loc=7)
-plt.title("Theorical SIR. Beta={0:.2f}, Gamma={1:.2f}".format(
+plt.legend(["Susceptible", "Infected", "Recovered"], loc=7, fontsize=12)
+plt.title("Theorical SIR. beta={0:.2f}, gamma={1:.2f}".format(
     beta, gamma
 ))
 plt.xlabel("Time")

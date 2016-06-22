@@ -1,6 +1,6 @@
 
-from .regions import regions
-from .routes import routes
+from .regions import regions, Region
+from .routes import routes, Route
 from ._cross_reference import cross_reference as _cross_reference
 import tools
 
