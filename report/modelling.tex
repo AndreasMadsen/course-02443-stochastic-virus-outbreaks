@@ -59,7 +59,7 @@ As an example of the above system let $K=3$ and the non zero transfer probabilit
 . Solving this system numerically with the outbreak starting in region 1 one gets the following curves:
 \begin{figure}[H]
 	\centering
-	\includegraphics[width= 1.0 \linewidth]{plots/sir_three_region.pdf}
+	\includegraphics[width= 1.0 \linewidth]{plots/sir_three_region_theory.pdf}
 	\caption{Numerical solution to the nonlinear ODE system defining a 3-region SIR model.}
 \end{figure}
 
@@ -83,7 +83,7 @@ where $\tau_{i,j}$ now is the discretized transfer probability.
 \subsubsection{Transfer using Dirichlet distribution}
 A problem with this approach, is the small risk that $\textsc{Binom}(S_{i, t-1}, \tau_{i,k}) = 0$ and $\textsc{Binom}(S_{k, t-1}, \tau_{k,i}) = S_k$ or similar unfortunate combination which will cause $S_{k,t}$ to become negative. This turns out to be a practical problem, to avoid this problem one should sample all the transfers for a region simultaneously such $\sum_{i \in K} \textsc{Binom}(S_{k,t-1}, \tau_{k,i}) \le S_{k, t}$.
 
-As there does not exist a multivariate version of the binomial distribution, the Dirichlet distribution is used as an approximation. This is convenient because $\sum_{i} X_{i,k} = 1$ if $\mathbf{X}_k \sim \textsc{Dir}(\boldsymbol{\alpha}_k)$. Because the Dirichlet distribution has support $X_i \in [0, 1]$, $\floor*{N_k X_{i,k}}$ is used.
+As there does not exist a multivariate version of the binomial distribution, the Dirichlet distribution is used as an approximation. This is convenient because $\sum_{i} X_{i,k} = 1$ if $\mathbf{X}_k \sim \textsc{Dir}(\boldsymbol{\alpha}_k)$. Because the Dirichlet distribution has support $X_i \in [0, 1]$, $\iround*{N_k X_{i,k}}$ is used.
 
 Furthermore to reduced the amount of sampling, the total transfer $T$ is sampled instead of sampling $S$, $I$ and $R$ independently.
 
@@ -135,7 +135,7 @@ Using this method for choosing $\alpha$, gives the distribution as seen in Figur
 \begin{figure}[H]
 	\centering
 	\includegraphics[width= 1.0 \linewidth]{plots/dirichlet-validation}
-	\caption{A dirichlet distribution  upscaled by $N$, with $\tau = (0.1, 0.1)$ and $N = 100$. First figure compare the marginal probability $P(\floor*{N X_1})$ with the binomial distribution. Second figure shows the Dirichlet pdf with $X_3 = 1- X_1 - X_2$.}
+	\caption{A dirichlet distribution  upscaled by $N$, with $\tau = (0.1, 0.1)$ and $N = 100$. First figure compare the marginal probability $P(\iround*{N X_1})$ with the binomial distribution. Second figure shows the Dirichlet pdf with $X_3 = 1- X_1 - X_2$.}
 	\label{fig:dirichlet-validation}
 \end{figure}
 
@@ -160,6 +160,3 @@ Using transfer probability will maintain the population over time, as the transf
 \begin{equation}
 \mathbb{E}[N_k \tau_{k, i}] = \mathbb{E}[N_i \tau_{i, k}] \Leftrightarrow N_k \tau_{k, i} = N_i \tau_{i, k}
 \end{equation}
-
-\subsection{Validation}
-\todo{run the 3 region example in our model and compare with the theoretical graph from earlier}

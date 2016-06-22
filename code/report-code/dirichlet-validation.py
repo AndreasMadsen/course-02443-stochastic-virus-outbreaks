@@ -44,7 +44,9 @@ n = np.arange(0, 101)
 plt.figure(figsize=(8, 8))
 plt.subplot(2, 1, 1)
 plt.bar(n, binomial.pmf(n), width=0.3, color='SteelBlue', lw=0, label='binomial')
-plt.bar(n + 0.3, beta.cdf((n + 1) / 101) - beta.cdf(n / 101), width=0.3, color='IndianRed', lw=0, label='dirichlet')
+plt.bar(n + 0.3,
+        beta.cdf(np.minimum(1, (n + 0.5) / 101)) - beta.cdf(np.maximum(0, (n - 0.5) / 101)),
+        width=0.3, color='IndianRed', lw=0, label='dirichlet')
 plt.legend(fontsize=12)
 plt.ylabel('properbility')
 plt.xlabel('transfers')

@@ -38,7 +38,7 @@ def sample_dirichlet(p_list, n):
         raise ValueError('sum of p_list excited 1, sum = %f' % sum(p_list))
 
     parts = scipy.stats.dirichlet.rvs(alpha)[0]
-    people = (parts * n).astype(int).tolist()
+    people = np.rint(parts * n).tolist()
 
     # Setup a people list with zeros, in case the properbility was zero
     people_zero = []
