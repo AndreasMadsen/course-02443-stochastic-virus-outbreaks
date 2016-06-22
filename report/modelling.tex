@@ -27,8 +27,15 @@ From equation \eqref{eq-S} and \eqref{eq-I} one can see that susceptible individ
 	\centering
 	\includegraphics[width= 1.0 \linewidth]{plots/sir_one_region.pdf}
 	\caption{Numerical solution to the nonlinear ODE system defining the SIR model.}
+	\label{fig:sir_one_region}
 \end{figure}
-\todo{comment on shape/interpretation of curve}
+
+From figure \ref{fig:sir_one_region} it seen how the number of infected increases quickly in the beginning, until a point where there aren't enough susceptible to sustain the infection rate. This is also seen from the differential equations:
+\begin{equation}
+\frac{d I(t)}{dt} = \frac{\beta}{N} I(t) S(t) - \gamma I(t) = 0 \Leftrightarrow \beta\frac{S(t)}{N} = \gamma
+\end{equation}
+
+In this hypothetical case almost everybody got infected, but that is not necessarily the case and depends entirely on $\gamma$ and $\beta$.
 
 \subsection{Multi-region SIR}
 Let it now be given that instead of having a single population, one has $K$ populations each with initial $N_k(0), S_k(0), I_k(0)$ and $R_k(0)$. Each of these populations have a probability of transferring individuals to other populations regardless of whether the individual is susceptible, infected or recovered. The governing equations are modified to add the transfers and become
