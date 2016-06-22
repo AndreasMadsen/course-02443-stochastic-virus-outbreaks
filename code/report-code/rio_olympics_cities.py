@@ -68,7 +68,7 @@ def execute_simulation(add_rio=False, ol_start=0, rio_length=18,
         sol_beijing[j] = []
         sol_sydney[j] = []
         sol_new_york[j] = []
-        for i, state in enumerate(sim.run(iterations=180)):
+        for i, state in enumerate(sim.run(iterations=100)):
             if i == ol_start and add_rio: # start outbreak x days before olympics
                 sim.add_event(2560, days=rio_length, total_transfer=rio_visitors)
 
