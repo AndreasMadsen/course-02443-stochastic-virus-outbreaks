@@ -41,8 +41,7 @@ binomial = scipy.stats.binom(n, p[0])
 n = np.arange(0, 101)
 
 # Plot marginal dirichlet distribution with binomial distribution
-plt.figure(figsize=(8, 8))
-plt.subplot(2, 1, 1)
+plt.figure(figsize=(8, 4))
 plt.bar(n, binomial.pmf(n), width=0.3, color='SteelBlue', lw=0, label='binomial')
 plt.bar(n + 0.3,
         beta.cdf(np.minimum(1, (n + 0.5) / 101)) - beta.cdf(np.maximum(0, (n - 0.5) / 101)),
@@ -52,7 +51,11 @@ plt.ylabel('properbility')
 plt.xlabel('transfers')
 plt.xlim(0, 100)
 
-ax = plt.subplot(2, 1, 2, projection='3d')
+plt.savefig(path.join(thisdir, '../../report/plots/dirichlet-validation-marginal.pdf'),
+            format='pdf', dpi=1000, bbox_inches='tight')
+
+plt.figure(figsize=(8, 4))
+ax = plt.subplot(projection='3d')
 
 X, Y = np.meshgrid(np.arange(1, 101), np.arange(1, 101))
 coords = np.vstack((
@@ -65,6 +68,6 @@ ax.plot_trisurf(coords[:, 0] * 101, coords[:, 1] * 101, Z, lw=0)
 ax.set_xlabel('transfers (region 1)')
 ax.set_ylabel('transfers (region 2)')
 ax.set_zlabel('pdf')
-
-plt.savefig(path.join(thisdir, '../../report/plots/dirichlet-validation.pdf'),
+plt.tight_layout()
+plt.savefig(path.join(thisdir, '../../report/plots/dirichlet-validation-pdf.pdf'),
             format='pdf', dpi=1000, bbox_inches='tight')

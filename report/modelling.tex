@@ -137,13 +137,19 @@ Using the $\alpha_{i}$ solution $\alpha_{K+1}$ can now be reformulated as
 \end{equation}
 which is computationally slightly more convenient.
 
-Using this method for choosing $\alpha$, gives the distribution as seen in Figure\ref{fig:dirichlet-validation}. As seen it has only minor errors when comparing to the binomial distribution.
+Using this method for choosing $\alpha$, gives the distribution as seen in Figure \ref{fig:dirichlet-validation-marginal}. As seen it has only minor errors when comparing to the binomial distribution.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width= 1.0 \linewidth]{plots/dirichlet-validation}
-	\caption{A dirichlet distribution  upscaled by $N$, with $\tau = (0.1, 0.1)$ and $N = 100$. First figure compare the marginal probability $P(\iround*{N X_1})$ with the binomial distribution. Second figure shows the Dirichlet pdf with $X_3 = 1- X_1 - X_2$.}
-	\label{fig:dirichlet-validation}
+	\includegraphics[width= 0.8 \linewidth]{plots/dirichlet-validation-marginal}
+	\caption{Compare the marginal probability $P(\iround*{N X_1})$ with the binomial distribution. The Dirichlet distribution upscaled by $N$, with $\tau = (0.1, 0.1)$ and $N = 100$.}
+	\label{fig:dirichlet-validation-marginal}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width= 0.8 \linewidth]{plots/dirichlet-validation-pdf}
+	\caption{Shows the Dirichlet pdf with $X_3 = 1- X_1 - X_2$. The Dirichlet distribution is upscaled by $N$, with $\tau = (0.1, 0.1)$ and $N = 100$.}
 \end{figure}
 
 \subsection{Transfer probabilities}
