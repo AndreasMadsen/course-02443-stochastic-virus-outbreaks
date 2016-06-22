@@ -100,7 +100,7 @@ class WorldMap:
         time.set_text('t = %d' % (i + 1))
         return scat, time
 
-    def animate(self, simulator, frames=365, fps=1 / 20):
+    def animate(self, simulator, frames=365, fps=1 / 20, max_infected=1):
         """
         Animates a simulator which implements a step function
 
@@ -136,7 +136,7 @@ class WorldMap:
         scat = self.map.scatter(
             x_map, y_map, c=self._getinfected(simulator, region_ids),
             s=sizes, lw=0, zorder=2,
-            vmin=0, vmax=1, cmap='summer'
+            vmin=0, vmax=max_infected, cmap='summer'
         )
 
         self.map.colorbar(scat)
@@ -150,6 +150,48 @@ class WorldMap:
             fargs=(simulator, region_ids, scat, time),
             repeat=False
         )
+
+    def scatter_infections(self, state, max_infected=1, time=0):
+        """Plots a scatter plot on the map of the current state
+
+        Parameters
+        ---------
+        state : current state
+        max_infected : upper bound on the colorbar used for the scatter plot
+
+        Returns
+        -------
+        None : Mutates the BaseMap object
+        """
+        regions = state.regions
+        region_ids = [region_id for region_id in regions.keys()]
+
+        # Pre compute longitude and latitudes, they are not updated
+        longitudes = np.fromiter(
+            (regions[id].longitude for id in region_ids),
+            dtype='float'
+        )
+        latitudes = np.fromiter(
+            (regions[id].latitude for id in region_ids),
+            dtype='float'
+        )
+        sizes = np.fromiter(
+            (math.sqrt(state.region_sir[id].total_pop) \
+            for id in state.region_sir),
+            dtype='float'
+        )
+        sizes = 5 + (sizes - min(sizes)) / (max(sizes)-min(sizes)) * 50
+        x_map, y_map = self.map(longitudes, latitudes)
+
+        scat = self.map.scatter(
+            x_map, y_map, c=[self._infected_rate(x) for x in state.region_sir.values()],
+            s=sizes, lw=0, zorder=2,
+            vmin=0, vmax=max_infected, cmap='summer'
+        )
+
+        self.map.colorbar(scat)
+        self.ax.text(*self.map(-170, -65), s='t = {0}'.format(time),
+            fontsize=12)
 
     def add_neighbours(self, regions):
         """
@@ -202,10 +244,10 @@ class WorldMap:
         else:
             plt.show()
 
-    def save_fig(self, name):
+    def save_fig(self, name, format='pdf', dpi=1000):
         if self.ani is not None:
-            plt.savefig(name, format='pdf',
-                        dpi=1000, bbox_inches='tight')
+            plt.savefig(name, format=format,
+                        dpi=dpi, bbox_inches='tight')
         else:
-            plt.savefig(name, format='pdf', dpi=1000,
+            plt.savefig(name, format=format, dpi=dpi,
                         bbox_inches='tight')

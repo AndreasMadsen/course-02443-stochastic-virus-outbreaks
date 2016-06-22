@@ -13,7 +13,7 @@ this_dir = path.dirname(path.realpath(__file__))
 
 def plot_sir(sols, names, fig_name):
     n = len(sols)
-    plt.subplots(figsize=(20,14))
+    plt.subplots(figsize=(10,12))
     for i in range(1, n+1):
         # share x-axis
         if i == 1:
@@ -41,7 +41,7 @@ def plot_sir(sols, names, fig_name):
     fig_save = path.join(this_dir, '../../report/plots/' + fig_name)
     print("saving figure {0}".format(fig_save))
     plt.savefig(fig_save,
-                format='pdf', dpi=1000, bbox_inches='tight')
+                format='pdf', bbox_inches='tight')
 
 
 def execute_simulation(add_rio=False, ol_start=0, rio_length=18,

@@ -8,3 +8,5 @@ main.pdf
 *.run.xml
 *.blg
 *.bbl
+*.fdb_latexmk
+*.fls
