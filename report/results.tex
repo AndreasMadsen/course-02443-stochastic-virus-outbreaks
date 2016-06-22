@@ -1,1 +1,32 @@
 %!TEX root = main.tex
+\section{Results}
+\subsection{With and without Olympic Games}
+Choosing $\beta=2$, $\gamma=0.5$ and an average transfer probability of $0.005$ we can run a simulation with and without the Olympic Games occurring with the previously described characteristics. We assume that the infection breaks out on the first day of the games in Rio De Janeiro. We set the initial infected population to 1000. In the following we will look at the SIR curves of 6 major cities.
+
+With the Olympics occurring we get the following curves:
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.0 \linewidth]{plots/rio-0-18-380000.pdf}
+	\caption{10 simulations with Olympic Games. Time in days on the x-axis and number of people on the y-axis}
+\end{figure}
+
+From the above plot we see that except for New York which seems to be infected quickest, the other major cities all seem to reach peak infection rates at the same time. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.0 \linewidth]{plots/no_rio.pdf}
+	\caption{10 simulations without Olympic Games. Time in days on the x-axis and number of people on the y-axis}
+\end{figure}
+
+If one looks closely at the plot above we see that without the Olympic Games peak infections occur later for especially Moscow, Beijing and Sydney. The is perhaps a bit easier to see in the table below:
+
+\begin{table}[H]
+	\centering
+	\input{tables/result}
+	\caption{Results of 10 simulations with and without Olympic Games. Table contains the peak times and amounts for the number of infected individuals.}
+\end{table}]
+
+\todo{comment on table}
+
+\subsection{Visualization of result}
+When studying a virus outbreak it is interesting to see exactly how the virus spreads. We have thus created an animation on a world map showing where each region is represented as a dot (scaled according to the population size) and the color of the represents the fraction infected:

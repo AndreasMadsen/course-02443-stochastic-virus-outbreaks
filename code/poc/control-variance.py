@@ -188,13 +188,13 @@ def control_variate_exp(N=100):
     mean_x, sigma_x = np.mean(x), np.std(x, ddof=1)
     z = x + (-0.14086/(1/12)) * (u - 0.5)
     mean_z, sigma_z = np.mean(z), np.std(z, ddof=1)
-    ci_x = scipy.stats.t.ppf(0.975, N - 1) * mean_x / math.qrt(N)
-    ci_z = scipy.stats.t.ppf(0.975, N - 1) * mean_z / math.qrt(N)
+    ci_x = scipy.stats.t.ppf(0.975, N - 1) * mean_x / math.sqrt(N)
+    ci_z = scipy.stats.t.ppf(0.975, N - 1) * mean_z / math.sqrt(N)
     print('crude mean: %f ± %f' % (mean_x, ci_x))
     print('control mean: %f ± %f' % (mean_z, ci_z))
     print('var(x)/var(z): %f' % (sigma_x / sigma_z)**2)
     return (mean_z, sigma_z, N)
-def control_variate_est(data, c_hat,  verbose=False):
+def control_variate_est(data, c_hat, verbose=False):
     N = data.shape[0]
     gamma = data[:, 0]
     beta = data[:, 1]
