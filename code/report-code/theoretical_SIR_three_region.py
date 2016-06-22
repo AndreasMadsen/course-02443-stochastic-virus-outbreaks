@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 thisdir = path.dirname(path.realpath(__file__))
 sys.path.append(path.join(thisdir, "../"))
 
-N_1 = 50
-N_2 = 50
-N_3 = 50
+N_1 = 1
+N_2 = 1
+N_3 = 1
 beta = 0.1
 gamma = 0.01
 
@@ -29,8 +29,8 @@ def solver(Y, t):
             beta / sum(Y[6:]) * Y[7] * Y[6] - gamma * Y[7] + transfer_prob * (Y[4]-Y[7]),
             gamma * Y[7] + transfer_prob * (Y[5] - Y[8])]
 
-start_infection_n1 = 2
-t = np.arange(0, 365, 0.01)
+start_infection_n1 = 2 / 50
+t = np.arange(0, 365, 1)
 asol = integrate.odeint(solver, [N_1 - start_infection_n1,
                                  start_infection_n1,
                                  0,
@@ -42,6 +42,7 @@ asol = integrate.odeint(solver, [N_1 - start_infection_n1,
                                  0], t)
 plt.figure(figsize=(12, 8))
 
+asol = asol * 100
 plt.plot(t, asol[:, 0], ls='-', color='g')
 plt.plot(t, asol[:, 1], ls='-', color='r')
 plt.plot(t, asol[:, 2], ls='-', color='b')
@@ -55,11 +56,11 @@ plt.plot(t, asol[:, 8], ls='--', color='b')
 plt.legend(["Susceptible 1", "Infected 1", "Recovered 1",
             "Susceptible 2", "Infected 2", "Recovered 2",
             "Susceptible 3", "Infected 3", "Recovered 3"], loc=7)
-plt.title("Theorical SIR 3 regions. N_k={0:d}, Beta={1:.2f}, Gamma={2:.2f}, tau =1e-4".format(
-    N_2, beta, gamma
+plt.title("Theoretical SIR 3 regions. beta={0:.2f}, gamma={1:.2f}, tau={2:.0e}".format(
+    beta, gamma, transfer_prob
 ))
 plt.xlabel("Time")
-plt.ylabel("# of individuals")
-#plt.show()
-plt.savefig(path.join(thisdir, '../../report/plots/sir_three_region.pdf'),
+plt.ylabel("% individuals")
+plt.ylim(0, 100)
+plt.savefig(path.join(thisdir, '../../report/plots/sir_three_region_theory.pdf'),
             format='pdf', dpi=1000, bbox_inches='tight')
