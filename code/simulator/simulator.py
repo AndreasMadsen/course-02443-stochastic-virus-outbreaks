@@ -84,7 +84,7 @@ class Simulator:
             if key == id:
                 continue #skip target region
             from_region = self.state.region_sir[key]
-            total_from = sum(from_region.as_tuple())
+            total_from = from_region.total_pop
             if total_from == 0:
                 continue #skip, there is nothign to distribute
             transfer_amount = np.round(total_transfer * total_from / N)
@@ -94,13 +94,11 @@ class Simulator:
             send_infected = (transfer_amount * from_region.infected) // total_from
             send_removed = (transfer_amount * from_region.removed) // total_from
 
-            from_region.susceptible -= send_susceptible
-            from_region.infected -= send_infected
-            from_region.removed -= send_removed
+            from_region.transfer_from(send_susceptible, send_infected,
+                                      send_removed)
 
-            target_region.susceptible += send_susceptible
-            target_region.infected += send_infected
-            target_region.removed += send_removed
+            target_region.transfer_to(send_susceptible, send_infected,
+                                      send_removed)
 
         self.time_to_reverse = days
 
@@ -109,20 +107,18 @@ class Simulator:
         for key, transfer_amount in self.reverse_transfer_amount.items():
             to_region = self.state.region_sir[key]
 
-            total_from = sum(from_region.as_tuple())
+            total_from = from_region.total_pop
             if total_from == 0:
                 break # nothing left to distribute
             send_susceptible = (transfer_amount * from_region.susceptible) // total_from
             send_infected = (transfer_amount * from_region.infected) // total_from
             send_removed = (transfer_amount * from_region.removed) // total_from
 
-            from_region.susceptible -= send_susceptible
-            from_region.infected -= send_infected
-            from_region.removed -= send_removed
+            from_region.transfer_from(send_susceptible, send_infected,
+                                      send_removed)
 
-            to_region.susceptible += send_susceptible
-            to_region.infected += send_infected
-            to_region.removed += send_removed
+            to_region.transfer_to(send_susceptible, send_infected,
+                                  send_removed)
 
     def update_single_region(self, region_sir):
         """Spreads the virus and updates removed within region

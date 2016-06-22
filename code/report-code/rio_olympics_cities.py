@@ -33,12 +33,14 @@ def plot_sir(sols, names, fig_name):
         p4, = plt.plot(sol[:, 3], color='Gray', alpha=0.5, label='Total')
         plt.legend([p1, p2, p3, p4], ['S', 'I', 'R', 'T'])
 
-    plt.savefig(path.join(this_dir, '../../report/plots/' + fig_name),
+    fig_save = path.join(this_dir, '../../report/plots/' + fig_name)
+    print("saving figure {0}".format(fig_save))
+    plt.savefig(fig_save,
                 format='pdf', dpi=1000, bbox_inches='tight')
 
 
-def execute_simulation(add_rio=False, rio_start=0, rio_length=18,
-                       rio_visitors=380e3):
+def execute_simulation(add_rio=False, ol_start=0, rio_length=18,
+                       rio_visitors=1e6):#380e3):
     state = State(regions, routes, verbose=True)
     state.set_outbreak('Rio De Janeiro', 1e3)#'Rio De Janeiro', 1000)
     sim = Simulator(state, transfer_prob=0.005, beta=2, gamma=0.5,
@@ -52,7 +54,7 @@ def execute_simulation(add_rio=False, rio_start=0, rio_length=18,
     sol_sydney = []
     sol_new_york = []
     for i, state in enumerate(sim.run(iterations=180)):
-        if i == rio_start and add_rio: # start outbreak x days before olympics
+        if i == ol_start and add_rio: # start outbreak x days before olympics
             sim.add_event(2560, days=rio_length, total_transfer=rio_visitors)
 
         sol_rio.append(state.region_sir[2560].as_tuple(total=True))
@@ -63,8 +65,8 @@ def execute_simulation(add_rio=False, rio_start=0, rio_length=18,
         sol_new_york.append(state.region_sir[3797].as_tuple(total=True))
 
     if add_rio:
-        fig_name = "rio-{0}-{1}-{2:d}.pdf".format(rio_start, rio_length,
-                                                int(rio_visitors))
+        fig_name = "rio-{0}-{1}-{2:d}.pdf".format(ol_start, rio_length,
+                                                  int(rio_visitors))
     else:
         fig_name = "no_rio.pdf"
 
