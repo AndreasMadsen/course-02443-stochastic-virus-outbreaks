@@ -11,7 +11,7 @@ Z_i = Y_i - c (X_i - \mathbb{E}[X])
 
 Choosing $c = \dfrac{Cov(X, Y)}{Var(X)}$ gives the largest variance reduction of:
 \begin{equation}
-\frac{Var(Z)}{Var(Y)} = \frac{Var(X)}{Var(X)} - \frac{Cov(X, Y)^2}{Var(X) Var(Y)} = 1 - \rho_{x, y}^2
+\frac{Var(Z)}{Var(Y)} = \frac{Var(X)}{Var(X)} - \frac{Cov(X, Y)^2}{Var(X) Var(Y)} = 1 - \rho_{x, y}^2 \label{eq:variance-reduction}
 \end{equation}
 
 In our case there is no analytical expression for the covariance or variance of the random variables. Instead $c$ is estimated from a second dataset. The procedure is:
@@ -19,6 +19,17 @@ In our case there is no analytical expression for the covariance or variance of 
 	\item Draw $N_0$ samples $(X_{0,i}, Y_{0, i})$ and calculate $\hat{c}$
 	\item Draw $N$ samples $(X_i, Y_i)$ and estimate $\mathbb{E}[Z] = \mathbb{E}[X]$ and $Var(Z)$.
 \end{enumerate}
+
+\subsubsection{Estimating infection rate}
+
+From \eqref{eq:variance-reduction} it seen that to get a high variance reduction, $X_i$ just need to be heavily correlated with $Z_i$. In our case we would like to estimate the infection peak time and how many people where infected at the peak. From the theoretical differential equation model those values should correlated with the infection rate $\beta$.
+
+Assuming the stochastic model have a behaviour somewhat similar to the differential equation model, there exists fairly simple methods for estimating $\beta$ and $\gamma$ \cite{wiki-sir}.
+\begin{equation}
+\gamma = \frac{R'_{max}}{I_{max}} \text{ and } \beta = -\frac{\ln(p)}{1 - p} \gamma \quad \text{where: } p = \frac{N - R_\infty}{N} 
+\end{equation}
+
+$R'_{max}$ is the maximum removed difference, and $I_{max}$ is the maximum infected. Due to the differential equation connection these are found at the same time $t$. $R_\infty$ is how many people where removed in the end, $p$ is thus the survival rate.
 
 \subsection{Effect of Global Events}
 We want to estimate what effect a global event can have on a virus-outbreak. We define an event $e$ simply as being a transfer of people from one or more regions $r_{f, i}$ to region $r_t$ at a time $t_0$, and the reverse transfer of people from $r_t$ to $r_{f, i}$ at time $t_1$.
