@@ -6,6 +6,7 @@ import scipy.stats
 import matplotlib.pyplot as plt
 import scipy.stats
 import math
+import csv
 
 from simulator import State, Simulator
 from world import regions, routes
@@ -94,7 +95,7 @@ def execute_simulation(add_rio=False, ol_start=0, rio_length=18,
         sol_sydney.append([])
         sol_new_york.append([])
         state_list = []
-        for i, state in enumerate(sim.run(iterations=120)):
+        for i, state in enumerate(sim.run(iterations=60)):
             state_list.append(state)
             if i == ol_start and add_rio: # start outbreak x days before olympics
                 sim.add_event(2560, days=rio_length, total_transfer=rio_visitors)
@@ -157,6 +158,26 @@ def execute_simulation(add_rio=False, ol_start=0, rio_length=18,
     t_deviations = scipy.stats.t.ppf(0.975, len(peak_times_rio)-1)
 
     # estimate variance with control variates
+    with open('control-{0}.csv'.format(add_rio), 'w') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',')
+        writer.writerow(['global_amount', 'global_amount_control',
+                         'global_peak_time', 'global_peak_time_control',
+                         'rio_time', 'rio_time_control',
+                         'new_york_time', 'new_york_time_control',
+                         'berlin_time', 'berlin_time_control',
+                         'moscow_time', 'moscow_time_control',
+                         'beijing_time', 'beijing_time_control',
+                         'sydney_time', 'sydney_time_control'])
+        for i in range(n_simulations):
+            writer.writerow([peak_amount_global[i], params['global'][i],
+                             peak_times_global[i], params['global'][i],
+                             peak_times_rio[i], params['rio'][i],
+                             peak_times_rio[i], params['new'][i],
+                             peak_times_rio[i], params['berlin'][i],
+                             peak_times_rio[i], params['moscow'][i],
+                             peak_times_rio[i], params['beijing'][i],
+                             peak_times_rio[i], params['sydney'][i]
+                             ])
     amount_global_control_conf = control_variate_conf(peak_amount_global, params['global'])
     time_global_control_conf = control_variate_conf(peak_times_global, params['global'])
     time_rio_control_conf = control_variate_conf(peak_times_rio, params['rio'])
