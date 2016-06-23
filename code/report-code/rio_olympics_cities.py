@@ -30,7 +30,7 @@ def plot_sir(sols, names, fig_name):
         ax.set_title(names[i-1])
 
 
-        for simulation in sols[i-1].values():
+        for simulation in sols[i-1]:
             sol = np.asarray(simulation)
 
             p1, = plt.plot(sol[:, 0], color='SteelBlue', alpha=0.5, label='Susceptible')
@@ -64,14 +64,21 @@ def control_variate_conf(y, x, verbose=False):
 def execute_simulation(add_rio=False, ol_start=0, rio_length=18,
                        rio_visitors=380e3, n_simulations=5):
 
-    sol_global = {}
-    sol_rio = {}
-    sol_moscow = {}
-    sol_berlin = {}
-    sol_beijing = {}
-    sol_sydney = {}
-    sol_new_york = {}
-    params = []
+    sol_global = []
+    sol_rio = []
+    sol_moscow = []
+    sol_berlin = []
+    sol_beijing = []
+    sol_sydney = []
+    sol_new_york = []
+    params = {}
+    params['global'] = []
+    params['rio'] = []
+    params['moscow'] = []
+    params['berlin'] = []
+    params['beijing'] = []
+    params['sydney'] = []
+    params['new'] = []
     for j in range(n_simulations):
         print("running simulation {0} / {1}".format(j + 1, n_simulations))
         state = State(regions, routes, verbose=True)
@@ -79,13 +86,13 @@ def execute_simulation(add_rio=False, ol_start=0, rio_length=18,
         sim = Simulator(state, transfer_prob=0.005, beta=2, gamma=0.5,
                         verbose=True)
 
-        sol_global[j] = []
-        sol_rio[j] = []
-        sol_moscow[j] = []
-        sol_berlin[j] = []
-        sol_beijing[j] = []
-        sol_sydney[j] = []
-        sol_new_york[j] = []
+        sol_global.append([])
+        sol_rio.append([])
+        sol_moscow.append([])
+        sol_berlin.append([])
+        sol_beijing.append([])
+        sol_sydney.append([])
+        sol_new_york.append([])
         state_list = []
         for i, state in enumerate(sim.run(iterations=120)):
             state_list.append(state)
@@ -100,8 +107,20 @@ def execute_simulation(add_rio=False, ol_start=0, rio_length=18,
             sol_sydney[j].append(state.region_sir[3361].as_tuple(total=True))
             sol_new_york[j].append(state.region_sir[3797].as_tuple(total=True))
 
-        param_est = sir.ParameterEstimator(iter(state_list), method='max')
-        params.append(param_est.beta)
+        params['global'].append(sir.ParameterEstimator(
+            iter([x.total_sir() for x in state_list]), method='max').beta)
+        params['rio'].append(sir.ParameterEstimator(
+            iter([x.region_sir[2560] for x in state_list]), method='max').beta)
+        params['moscow'].append(sir.ParameterEstimator(
+            iter([x.region_sir[4029] for x in state_list]), method='max').beta)
+        params['berlin'].append(sir.ParameterEstimator(
+            iter([x.region_sir[351] for x in state_list]), method='max').beta)
+        params['beijing'].append(sir.ParameterEstimator(
+            iter([x.region_sir[3364] for x in state_list]), method='max').beta)
+        params['sydney'].append(sir.ParameterEstimator(
+            iter([x.region_sir[3361] for x in state_list]), method='max').beta)
+        params['new'].append(sir.ParameterEstimator(
+            iter([x.region_sir[2560] for x in state_list]), method='max').beta)
 
     if add_rio:
         fig_name = "rio-{0}-{1}-{2:d}.pdf".format(ol_start, rio_length,
@@ -115,7 +134,7 @@ def execute_simulation(add_rio=False, ol_start=0, rio_length=18,
               'Moscow', 'Beijing', 'Sydney'], fig_name)
 
     # estimate means and variance
-    global_values = sol_global.values()
+    global_values = sol_global
     peak_times_global = [np.argmax([x[1] for x in y])
                          for y in global_values]
     peak_amount_global = [y[peak][1]
@@ -123,29 +142,29 @@ def execute_simulation(add_rio=False, ol_start=0, rio_length=18,
 
 
     peak_times_rio = [np.argmax([x[1] for x in y])
-                      for y in  sol_rio.values()]
+                      for y in  sol_rio]
     peak_times_new_york = [np.argmax([x[1] for x in y])
-                           for y in  sol_new_york.values()]
+                           for y in  sol_new_york]
     peak_times_berlin = [np.argmax([x[1] for x in y])
-                         for y in  sol_berlin.values()]
+                         for y in  sol_berlin]
     peak_times_moscow = [np.argmax([x[1] for x in y])
-                         for y in  sol_moscow.values()]
+                         for y in  sol_moscow]
     peak_times_beijing = [np.argmax([x[1] for x in y])
-                          for y in  sol_beijing.values()]
+                          for y in  sol_beijing]
     peak_times_sydney = [np.argmax([x[1] for x in y])
-                         for y in  sol_sydney.values()]
+                         for y in  sol_sydney]
 
     t_deviations = scipy.stats.t.ppf(0.975, len(peak_times_rio)-1)
 
     # estimate variance with control variates
-    amount_global_control_conf = control_variate_conf(peak_amount_global, params)
-    time_global_control_conf = control_variate_conf(peak_times_global, params)
-    time_rio_control_conf = control_variate_conf(peak_times_rio, params)
-    time_new_york_control_conf = control_variate_conf(peak_times_new_york, params)
-    time_berlin_control_conf = control_variate_conf(peak_times_berlin, params)
-    time_moscow_control_conf = control_variate_conf(peak_times_moscow, params)
-    time_beijing_control_conf = control_variate_conf(peak_times_beijing, params)
-    time_sydney_control_conf = control_variate_conf(peak_times_sydney, params)
+    amount_global_control_conf = control_variate_conf(peak_amount_global, params['global'])
+    time_global_control_conf = control_variate_conf(peak_times_global, params['global'])
+    time_rio_control_conf = control_variate_conf(peak_times_rio, params['rio'])
+    time_new_york_control_conf = control_variate_conf(peak_times_new_york, params['new'])
+    time_berlin_control_conf = control_variate_conf(peak_times_berlin, params['berlin'])
+    time_moscow_control_conf = control_variate_conf(peak_times_moscow, params['moscow'])
+    time_beijing_control_conf = control_variate_conf(peak_times_beijing, params['beijing'])
+    time_sydney_control_conf = control_variate_conf(peak_times_sydney, params['sydney'])
 
     return [(np.mean(peak_amount_global),
              t_deviations * np.std(peak_amount_global, ddof=1) / math.sqrt(n_simulations),

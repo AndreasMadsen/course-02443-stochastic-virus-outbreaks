@@ -22,15 +22,15 @@ class ParameterEstimator:
 
     def _regression_estimator(self, sir_iterator):
         # Get initialization constant
-        first_sir = next(sir_iterator).total_sir()
+        first_sir = next(sir_iterator)
         self.population = first_sir.total_pop
         self.init_infected = first_sir.infected
 
         # Count infected in each time step and find the final removed
         infected = [self.init_infected]
         final_removed = 0
-        for state in sir_iterator:
-            total = state.total_sir()
+        for sir in sir_iterator:
+            total = sir
             final_removed = total.removed
             infected.append(total.infected)
 
@@ -59,7 +59,7 @@ class ParameterEstimator:
 
     def _max_estimator(self, sir_iterator):
         # Get initialization constant
-        first_sir = next(sir_iterator).total_sir()
+        first_sir = next(sir_iterator)
         self.population = first_sir.total_pop
         self.init_infected = first_sir.infected
 
@@ -69,8 +69,8 @@ class ParameterEstimator:
         max_removed = 0
         final_removed = 0
 
-        for i, state in enumerate(sir_iterator):
-            total = state.total_sir()
+        for i, sir in enumerate(sir_iterator):
+            total = sir
 
             final_removed = total.removed
 
@@ -83,9 +83,15 @@ class ParameterEstimator:
 
         # calculate gamma and beta
         survival_rate = (self.population - final_removed) / self.population
-        frac_beta_gamma = - math.log(survival_rate) / (1 - survival_rate)
+        if survival_rate == 1:
+            frac_beta_gamma = np.nan
+        else:
+            frac_beta_gamma = - math.log(survival_rate) / (1 - survival_rate)
 
-        self.gamma = max_removed / max_infected
+        if max_infected == 0:
+            self.gamma = np.nan
+        else:
+            self.gamma = max_removed / max_infected
         self.beta = frac_beta_gamma * self.gamma
 
         print('max_infected = %d' % max_infected)
