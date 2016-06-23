@@ -16,7 +16,7 @@ From figure \ref{fig:rio-0-18-380000} it's seen that except for Rio where the in
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1.0 \linewidth]{plots/no_rio.pdf}
-	\caption{10 simulations without Olympic Games. Time in days on the x-axis and number of people on the y-axis}
+	\caption{10 simulations without Olympic Games. Time in days on the x-axis and number of people on the y-axis. Shown is susceptible (S), infected (I), removed (R) and total population (T).}
 	\label{fig:no_rio}
 \end{figure}
 
@@ -29,25 +29,27 @@ When there is no Olympic Games, as seen in figure \ref{fig:no_rio}, the peak inf
 	\label{table:olympic-summary}
 \end{table}
 
-As mentioned one see in table \ref{table:olympic-summary} that the peak time is much less spread and generally happens earlier, when the Olympic Games happens. This is particularly apparent when comparing with the global peak time, which in the case without Olympic Games, happens statistically significantly later when comparing to the cities. While in the Olympic Games case, it is within statistical significantly, except for the Network and Rio case.
+As mentioned, table \ref{table:olympic-summary} shows that the peak time is much less spread and generally happens earlier, when the Olympic Games happens. This is particularly apparent when comparing with the global peak time, which in the case without Olympic Games, happens statistically significantly later when comparing to the cities. While in the Olympic Games case, it is within statistical significantly, except for the Network and Rio case.
 
-Rio doesn't have a significantly difference in peak time, this makes sense as this is where the infection starts. Adding 380000 people (out of 12 million people) doesn't make much of a difference. The New York case is also interesting
+Rio doesn't have a significantly difference in peak time, this makes sense as this is where the infection starts. Adding 380000 people (out of 12 million people) doesn't make much of a difference. The New York case is also interesting, as there isn't a significant change. This is likely because New York being in North Amerika and Rio being in South Amerika is much closer connected though airlines, compared to the other counties which are across the Pacific or Atlantic ocean. 
 
 \subsection{Visualization of result}
-When studying a virus outbreak it is interesting to see exactly how the virus spreads. We have thus created an animation on a world map showing where each region is represented as a dot (scaled according to the population size) and the color of the dot represents the fraction infected. With this visualization the difference between including the Olympic Games and including becomes more apparent.
+When studying a virus outbreak it is interesting to see exactly how the virus spreads. We have thus created an animation on a world map showing where each region is represented as a dot. Each dot is placed at the region center (airport), scaled according to the population size, and the color represents the fraction infected.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=1.0 \linewidth]{plots/gifs/frames/rio-45}
-	\caption{Frame 45 of animation with Olympic Games. The full animation can be viewed as a gif at
+	\includegraphics[width=1.0 \linewidth]{plots/gifs/frames/rio-46}
+	\caption{Timestep 46, with Olympic Games. The full animation can be viewed at
 		\url{https://andreasmadsen.github.io/course-02443-stochastic-virus-outbreaks/}}
+	\label{fig:rio-46}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=1.0 \linewidth]{plots/gifs/frames/noRio-55}
-	\caption{Frame 55 of animation without Olympic Games. The full animation can be viewed as a gif at
+	\includegraphics[width=1.0 \linewidth]{plots/gifs/frames/noRio-67}
+	\caption{Timestep 67, without Olympic Games. The full animation can be viewed at
 		\url{https://andreasmadsen.github.io/course-02443-stochastic-virus-outbreaks/}}
+	\label{fig:noRio-67}
 \end{figure}
 
-
+From figure \ref{fig:rio-46} and figure \ref{fig:noRio-67} the conclusion from table \ref{table:olympic-summary} can be reconfirmed. The peak happens almost simultaneously across the globe when including the Olympic Games, while the spread pattern has a wave behaviour when not including the Olympic Games.
