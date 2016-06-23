@@ -1,10 +1,10 @@
 %!TEX root = main.tex
 \section{Modelling}
-This report seeks to model the infection as a function of time of a global virus outbreak. To do, firstly it will be described how one might model a virus outbreak in small uniform population. Secondly, this model will be expanded to include multiple population groups and their interactions.
+This report will analyze how a virus outbreak evolves over time on a global scale. To do so, firstly it will be described how one might model a virus outbreak in a small uniform population. Secondly, this model will be expanded to include multiple population groups and their interactions.
 
 \subsection{The SIR Model}
 \subsubsection{Assumption}
-The Susceptible-Infected-Removed model is a compartmental model assuming that within some subdivision of the population containing $N$ individuals, virus infection, cure and spread rates are i.i.d. for the 3 ``compartments'' of individuals:
+The Susceptible-Infected-Removed model is a compartmental model assuming that within some subdivision of the population containing $N$ individuals, virus infection, cure and spread rates are i.i.d. within each of the 3 ``compartments'' of individuals:
 \begin{itemize}
 	\item Susceptible to the virus
 	\item Infected by the virus
@@ -19,7 +19,7 @@ The SIR model is governed by 3 differential equations,
 \frac{d I(t)}{dt} &= \frac{\beta}{N} I(t) S(t) - \gamma I(t)  \label{eq-I}\\
 \frac{d R(t)}{dt} &= \gamma I(t) \label{eq-R}
 \end{align}
-where $S(t), I(t)$ and $R(t)$ are functions describing the number of susceptible, infected and removed individuals at time t, $\beta$ is the rate of infection, $\gamma$ the rate of removal (dead or cured) and $N$ the total number of individuals.
+, where $S(t), I(t)$ and $R(t)$ are functions describing the number of susceptible, infected and removed individuals at time t, $\beta$ is the rate of infection, $\gamma$ the rate of removal (dead or cured) and $N$ the total number of individuals.
 
 From equation \eqref{eq-S} and \eqref{eq-I} one can see that susceptible individuals become infected by some ratio $\beta$ and the ratio of already infected individuals. From \eqref{eq-I} and \eqref{eq-R} one can see that infected individuals recover with a constant factor $\gamma$. 
 
@@ -30,7 +30,7 @@ From equation \eqref{eq-S} and \eqref{eq-I} one can see that susceptible individ
 	\label{fig:sir_one_region}
 \end{figure}
 
-From figure \ref{fig:sir_one_region} it seen how the number of infected increases quickly in the beginning, until a point where there aren't enough susceptible to sustain the infection rate. This is also seen from the differential equations:
+From figure \ref{fig:sir_one_region} it seen how the number of infected individuals increases quickly in the beginning, until a point where there are not enough susceptible to sustain the infection rate. This is also seen from the differential equations:
 \begin{equation}
 \frac{d I(t)}{dt} = \frac{\beta}{N} I(t) S(t) - \gamma I(t) = 0 \Leftrightarrow \beta\frac{S(t)}{N} = \gamma
 \end{equation}
@@ -70,11 +70,11 @@ As an example of the above system let $K=3$ and the non zero transfer probabilit
 	\caption{Numerical solution to the nonlinear ODE system defining a 3-region SIR model.}
 \end{figure}
 
-From the above plot it's seen that the virus first spreads in region 1. After a certain time a enough infected individuals have been transferred to region 2 where the infection then accelerates. This continues to region 3.
+From the above plot it's seen that the virus first spreads in region 1. After a certain time enough infected individuals have been transferred to region 2 where the infection then accelerates. This continues to region 3.
 
 \subsection{Stocastic Model}
 
-To simulate the multi-region SIR model stochastically, a binomial distribution is used to sample how many people get infected, removed and transferred. The binomial probability is chosen such the expectation is the same, as in the differential equation model.
+To simulate the multi-region SIR model stochastically, a binomial distribution is used to sample how many people get infected, removed and transferred. The binomial probability is chosen such that the distribution's expectation is the same as the terms in the differential equations,
 \begin{equation*}
 \begin{aligned}
 \Delta I_{k,t} &= \textsc{Binom}\left(S_{k,t}, \beta \frac{I_{k, t}}{N_k}\right) \\
@@ -85,10 +85,10 @@ R_{k,t} &= R_{k,t-1} + \Delta R_{k, t} + \sum_{i \in K} \left(\textsc{Binom}(R_{
 \end{aligned}
 \end{equation*}
 
-where $\tau_{i,j}$ now is the discretized transfer probability.
+, where $\tau_{i,j}$ now is the discretized transfer probability.
 
 \subsubsection{Transfer using Dirichlet distribution}
-A problem with this approach, is the small risk that $\textsc{Binom}(S_{i, t-1}, \tau_{i,k}) = 0$ and $\textsc{Binom}(S_{k, t-1}, \tau_{k,i}) = S_k$ or similar unfortunate combination which will cause $S_{k,t}$ to become negative. This turns out to be a practical problem, to avoid this problem one should sample all the transfers for a region simultaneously such $\sum_{i \in K} \textsc{Binom}(S_{k,t-1}, \tau_{k,i}) \le S_{k, t}$.
+A problem with this approach, is the small risk that $\textsc{Binom}(S_{i, t-1}, \tau_{i,k}) = 0$ and $\textsc{Binom}(S_{k, t-1}, \tau_{k,i}) = S_k$ or similar unfortunate combination which would cause $S_{k,t}$ to become negative (i.e. there is a small non zero probability that if transfers are drawn independently that an unfeasible state would occur). In practice, this is a big problem if the number of regions is large. The only way to avoid this problem is to sample all the transfers for a region simultaneously such that $\sum_{i \in K} \textsc{Binom}(S_{k,t-1}, \tau_{k,i}) \le S_{k, t}$.
 
 As there does not exist a multivariate version of the binomial distribution, the Dirichlet distribution is used as an approximation. This is convenient because $\sum_{i} X_{i,k} = 1$ if $\mathbf{X}_k \sim \textsc{Dir}(\boldsymbol{\alpha}_k)$. Because the Dirichlet distribution has support $X_i \in [0, 1]$, $\iround*{N_k X_{i,k}}$ is used.
 
