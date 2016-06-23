@@ -122,7 +122,7 @@ Y_0 = testA[:, -2]
 
 
 
-mean_1, std_1, n_1 = control_variate_est(run_with_y, run_with_x, verbose=True)
+mean_1, std_1, n_1 = control_variate_est([x/1e6 for x in run_with_y], run_with_x, verbose=True)
 
 mean_1, std_1, n_1 = control_variate_est(Y_0, X_0, verbose=True)
 mean_2, std_2, n_2 = control_variate_est(testB[:, -2], testB[:, 1], verbose=True)
