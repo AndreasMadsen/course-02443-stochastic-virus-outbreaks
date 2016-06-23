@@ -67,6 +67,7 @@ class ParameterEstimator:
         max_infected = 0
         max_infected_i = 0
         max_removed = 0
+        max_removed_diff = 0
         final_removed = 0
 
         for i, sir in enumerate(sir_iterator):
@@ -77,9 +78,9 @@ class ParameterEstimator:
             if total.infected > max_infected:
                 max_infected = total.infected
                 max_infected_i = i + 1
+                max_removed_diff = total.removed - max_removed
 
-            if total.removed > max_removed:
-                max_removed = total.removed
+            max_removed = total.removed
 
         # calculate gamma and beta
         survival_rate = (self.population - final_removed) / self.population
@@ -91,7 +92,7 @@ class ParameterEstimator:
         if max_infected == 0:
             self.gamma = np.nan
         else:
-            self.gamma = max_removed / max_infected
+            self.gamma = max_removed_diff / max_infected
         self.beta = frac_beta_gamma * self.gamma
 
         print('max_infected = %d' % max_infected)
