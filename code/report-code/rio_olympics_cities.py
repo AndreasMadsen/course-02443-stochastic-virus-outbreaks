@@ -173,7 +173,7 @@ if __name__ == "__main__":
     res_with_ol = execute_simulation(True, n_simulations=n_sim)
     res_without_ol = execute_simulation(False, n_simulations=n_sim)
 
-    latex_table = "\\begin{tabular}[H]{c | c | c |}"
+    latex_table = "\\begin{tabular}[H]{c | c | c}"
     latex_table += "\nObservation & With OL & Without OL \\\\ \\hline "
     latex_table += "\n {0} [million]& ${1:.1f}\\pm {2:.2f} ({3:.2f})$ & ${4:.1f} \\pm {5:.2f} ({6:.2f})$".format(
         names[0], res_with_ol[0][0] / 1e6, res_with_ol[0][1] / 1e6, res_with_ol[0][2] / 1e6,
@@ -190,9 +190,3 @@ if __name__ == "__main__":
     tex_file = open(table_save, 'w')
     tex_file.write(latex_table)
     tex_file.close()
-
-
-
-
-
-

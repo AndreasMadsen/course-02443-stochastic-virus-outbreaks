@@ -7,26 +7,31 @@ With the Olympics occurring we get the following curves:
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1.0 \linewidth]{plots/rio-0-18-380000.pdf}
-	\caption{10 simulations with Olympic Games. Time in days on the x-axis and number of people on the y-axis}
+	\caption{10 simulations with Olympic Games. Time in days on the x-axis and number of people on the y-axis. Shown is susceptible (S), infected (I), removed (R) and total population (T).}
+	\label{fig:rio-0-18-380000}
 \end{figure}
 
-From the above plot we see that except for New York which seems to be infected quickest, the other major cities all seem to reach peak infection rates at the same time. 
+From figure \ref{fig:rio-0-18-380000} it's seen that except for Rio where the infection started and New York which seems to be infected earliest, the other major cities all seem to reach peak infection rates at approximately the same time. 
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1.0 \linewidth]{plots/no_rio.pdf}
 	\caption{10 simulations without Olympic Games. Time in days on the x-axis and number of people on the y-axis}
+	\label{fig:no_rio}
 \end{figure}
 
-If one looks closely at the plot above we see that without the Olympic Games peak infections occur later for especially Moscow, Beijing and Sydney. The is perhaps a bit easier to see in the table below:
+When there is no Olympic Games, as seen in figure \ref{fig:no_rio}, the peak infections occur later, especially for Moscow, Beijing and Sydney. The is emphasized in the summary table \ref{table:olympic-summary}.
 
 \begin{table}[H]
 	\centering
 	\input{tables/result}
 	\caption{Results of 10 simulations with and without Olympic Games. Table contains the peak times and amounts for the number of infected individuals. The standard $95\%$-confidence interval is marked with $\pm$ and the confidence interval using control variates is shown in the parenthesis.}
-\end{table}]
+	\label{table:olympic-summary}
+\end{table}
 
-\todo{comment on table}
+As mentioned one see in table \ref{table:olympic-summary} that the peak time is much less spread and generally happens earlier, when the Olympic Games happens. This is particularly apparent when comparing with the global peak time, which in the case without Olympic Games, happens statistically significantly later when comparing to the cities. While in the Olympic Games case, it is within statistical significantly, except for the Network and Rio case.
+
+Rio doesn't have a significantly difference in peak time, this makes sense as this is where the infection starts. Adding 380000 people (out of 12 million people) doesn't make much of a difference. The New York case is also interesting
 
 \subsection{Visualization of result}
 When studying a virus outbreak it is interesting to see exactly how the virus spreads. We have thus created an animation on a world map showing where each region is represented as a dot (scaled according to the population size) and the color of the dot represents the fraction infected. With this visualization the difference between including the Olympic Games and including becomes more apparent.
