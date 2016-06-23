@@ -40,18 +40,18 @@ asol = integrate.odeint(solver, [N_1 - start_infection_n1,
                                  N_3,
                                  0,
                                  0], t)
-plt.figure(figsize=(12, 8))
+plt.figure(figsize=(12, 6))
 
 asol = asol * 100
-plt.plot(t, asol[:, 0], ls='-', color='g')
-plt.plot(t, asol[:, 1], ls='-', color='r')
-plt.plot(t, asol[:, 2], ls='-', color='b')
-plt.plot(t, asol[:, 3], ls=':', color='g')
-plt.plot(t, asol[:, 4], ls=':', color='r')
-plt.plot(t, asol[:, 5], ls=':', color='b')
-plt.plot(t, asol[:, 6], ls='--', color='g')
-plt.plot(t, asol[:, 7], ls='--', color='r')
-plt.plot(t, asol[:, 8], ls='--', color='b')
+plt.plot(t, asol[:, 0], ls='-', color='SteelBlue')
+plt.plot(t, asol[:, 1], ls='-', color='IndianRed')
+plt.plot(t, asol[:, 2], ls='-', color='Olive')
+plt.plot(t, asol[:, 3], ls=':', color='SteelBlue')
+plt.plot(t, asol[:, 4], ls=':', color='IndianRed')
+plt.plot(t, asol[:, 5], ls=':', color='Olive')
+plt.plot(t, asol[:, 6], ls='--', color='SteelBlue')
+plt.plot(t, asol[:, 7], ls='--', color='IndianRed')
+plt.plot(t, asol[:, 8], ls='--', color='Olive')
 
 plt.legend(["Susceptible 1", "Infected 1", "Recovered 1",
             "Susceptible 2", "Infected 2", "Recovered 2",

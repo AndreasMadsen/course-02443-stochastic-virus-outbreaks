@@ -55,7 +55,7 @@ routes = {
     (2, 0): create_route(2, regions[2], regions[0]),
 }
 
-plt.figure(figsize=(12, 8))
+plt.figure(figsize=(12, 6))
 
 def solver(Y, t):
     return [- beta / sum(Y[:3]) * Y[1] * Y[0] + tau * (Y[6]-Y[0]),
@@ -95,15 +95,15 @@ for i in range(0, 10):
     asol = np.asarray(solution) * 100
     t = np.arange(0, asol.shape[0])
 
-    p1, = plt.plot(t, asol[:, 0], ls='-', color='g')
-    p2, = plt.plot(t, asol[:, 1], ls='-', color='r')
-    p3, = plt.plot(t, asol[:, 2], ls='-', color='b')
-    p4, = plt.plot(t, asol[:, 3], ls=':', color='g')
-    p5, = plt.plot(t, asol[:, 4], ls=':', color='r')
-    p6, = plt.plot(t, asol[:, 5], ls=':', color='b')
-    p7, = plt.plot(t, asol[:, 6], ls='--', color='g')
-    p8, = plt.plot(t, asol[:, 7], ls='--', color='r')
-    p9, = plt.plot(t, asol[:, 8], ls='--', color='b')
+    p1, = plt.plot(t, asol[:, 0], ls='-', color='SteelBlue')
+    p2, = plt.plot(t, asol[:, 1], ls='-', color='IndianRed')
+    p3, = plt.plot(t, asol[:, 2], ls='-', color='Olive')
+    p4, = plt.plot(t, asol[:, 3], ls=':', color='SteelBlue')
+    p5, = plt.plot(t, asol[:, 4], ls=':', color='IndianRed')
+    p6, = plt.plot(t, asol[:, 5], ls=':', color='Olive')
+    p7, = plt.plot(t, asol[:, 6], ls='--', color='SteelBlue')
+    p8, = plt.plot(t, asol[:, 7], ls='--', color='IndianRed')
+    p9, = plt.plot(t, asol[:, 8], ls='--', color='Olive')
 
 plt.legend(
     [p1, p2, p3, p4, p5, p6, p7, p8, p9, ptrue],

@@ -10,16 +10,16 @@ The Susceptible-Infected-Removed model is a compartmental model assuming that wi
 	\item Infected by the virus
 	\item Recovered and immune to the virus (or alternatively dead)
 \end{itemize} 
-. In reality economic status, job type, air-conditioning etc. will affect how a virus spread \cite{zika-modelling}, however, depending on the heterogeneity of the population these assumptions constitute a good approximation.
+In reality economic status, job type, air-conditioning etc. will affect how a virus spread \cite{zika-modelling}, however, depending on the heterogeneity of the population these assumptions constitute a good approximation.
 
 \subsubsection{Governing equations}
-The SIR model is governed by 3 differential equations,
+The SIR model is governed by 3 differential equations \cite{sir-basics}:
 \begin{align}
 \frac{d S(t)}{dt} &= - \frac{\beta}{N} I(t) S(t)   \label{eq-S}\\
 \frac{d I(t)}{dt} &= \frac{\beta}{N} I(t) S(t) - \gamma I(t)  \label{eq-I}\\
 \frac{d R(t)}{dt} &= \gamma I(t) \label{eq-R}
 \end{align}
-, where $S(t), I(t)$ and $R(t)$ are functions describing the number of susceptible, infected and removed individuals at time t, $\beta$ is the rate of infection, $\gamma$ the rate of removal (dead or cured) and $N$ the total number of individuals.
+$S(t), I(t)$ and $R(t)$ are functions describing the number of susceptible, infected and removed individuals at time t, $\beta$ is the rate of infection, $\gamma$ the rate of removal (dead or cured) and $N$ the total number of individuals.
 
 From equation \eqref{eq-S} and \eqref{eq-I} one can see that susceptible individuals become infected by some ratio $\beta$ and the ratio of already infected individuals. From \eqref{eq-I} and \eqref{eq-R} one can see that infected individuals recover with a constant factor $\gamma$. 
 
@@ -38,12 +38,14 @@ From figure \ref{fig:sir_one_region} it seen how the number of infected individu
 In this hypothetical case almost everybody got infected, but that is not necessarily the case and depends entirely on $\gamma$ and $\beta$.
 
 \subsection{Multi-region SIR}
-Let it now be given that instead of having a single population, one has $K$ populations each with initial $N_k(0), S_k(0), I_k(0)$ and $R_k(0)$. Each of these populations have a probability of transferring individuals to other populations regardless of whether the individual is susceptible, infected or recovered. The governing equations are modified to add the transfers and become
-\begin{align}
-\frac{d S_k(t)}{dt} &= - \frac{\beta}{N_k} I(t) S(t) + \sum_{i\in K} \left( S_i(t)\tau_{i,k} - S_k(t)\tau_{k, i}\right)   &\forall k\\
-\frac{d I_k(t)}{dt} &= \frac{\beta}{N_k} I(t) S(t) - \gamma I(t) + \sum_{i\in K} \left( I_i(t)\tau_{i,k} - I_k(t)\tau_{k, i}\right)  &\forall k\\
-\frac{d R_k(t)}{dt} &= \gamma I(t) + \sum_{i\in K} \left( R_i(t)\tau_{i,k} - R_k(t)\tau_{k, i}\right) &\forall k
-\end{align}
+Let it now be given that instead of having a single population, one has $K$ populations each with initial $N_k, S_k(0), I_k(0)$ and $R_k(0)$. Each of these populations have a probability of transferring individuals to other populations regardless of whether the individual is susceptible, infected or recovered. The governing equations are modified to add the transfers and become
+\begin{equation}
+\begin{aligned}
+\frac{d S_k(t)}{dt} &= - \frac{\beta}{N_k} I(t) S(t) + \sum_{i=1}^K \left( S_i(t)\tau_{i,k} - S_k(t)\tau_{k, i}\right)   &\forall k \in [1, K]\\
+\frac{d I_k(t)}{dt} &= \frac{\beta}{N_k} I(t) S(t) - \gamma I(t) + \sum_{i=1}^K \left( I_i(t)\tau_{i,k} - I_k(t)\tau_{k, i}\right)  &\forall k \in [1, K]\\
+\frac{d R_k(t)}{dt} &= \gamma I(t) + \sum_{i = 1}^K \left( R_i(t)\tau_{i,k} - R_k(t)\tau_{k, i}\right) &\forall k \in [1, K]
+\end{aligned}
+\end{equation}
 , where $\tau_{i,j}$ is the infinitesimal probability of transferring from population $i$ to $j$ per individual.
 
 As an example of the above system let $K=3$ and the non zero transfer probabilities be defined by the graph:
@@ -52,7 +54,7 @@ As an example of the above system let $K=3$ and the non zero transfer probabilit
 \begin{tikzpicture}
 
 \def \n {3}
-\def \radius {2cm}
+\def \radius {1.5cm}
 \def \margin {12} % margin in angles, depends on the radius
 
 \foreach \s in {1,...,\n}

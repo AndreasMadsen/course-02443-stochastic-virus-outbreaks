@@ -8,7 +8,7 @@ The basis of a realistic simulation of global virus outbreak is data on
 \end{itemize}
 
 \subsection{Population}
-The population data used in this report comes from NASA\footnote{\url{http://neo.sci.gsfc.nasa.gov/view.php?datasetId=SEDAC\_POP}}. The data is downloadable in a GeoTIFF file-format which is an image file with population encoded in the pixels.
+The population data used in this report comes from NASA \cite{nasa-population}. The data is downloadable in a GeoTIFF file-format which is an image file with population encoded in the pixels.
 
 \begin{figure}[H]
 	\centering
@@ -21,7 +21,7 @@ The population dataset encodes $99999.0$ as water and $1.0369266$ as unknown pop
 
 \subsection{Airport}
 
-The airport connection data was taken from OpenFlights \footnote{\url{http://openflights.org/data.html}}. The dataset contains 8021 airports with 37181 airline connections as well as the plane types flying the connection (this could potentially be used for estimating passenger counts). Some the airports did not have any connections and where thus removed.
+The airport connection data was taken from OpenFlights \cite{openflights}. The dataset contains 8021 airports with 37181 airline connections as well as the plane types flying the connection (this could potentially be used for estimating passenger counts). Some the airports did not have any connections and where thus removed.
 
 Plotting the airport connections we see that Europe, East Coast US and East Cost China are the most connected regions. So if a virus spreads takes hold in these areas we would expect it to cause a global outbreak quickly.
 
@@ -33,7 +33,7 @@ Plotting the airport connections we see that Europe, East Coast US and East Cost
 
 \subsection{Aggression}
 
-Based on the location of the airports a Voronoi partition of the of the earths surface is made. From this partitioning one now has geographical regions. The total population of each region can be found by summing over the appropriate pixels in the population dataset.
+Based on the location of the airports a Voronoi partition of the of the earths surface is made. From this partitioning one now has geographical regions. The total population of each region can be found by summing over the appropriate pixels in the population dataset. This aggression is the same as done in the GLEaM paper \cite{GLEaM}.
 
 \begin{figure}[H]
 	\centering

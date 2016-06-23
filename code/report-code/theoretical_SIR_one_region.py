@@ -26,10 +26,10 @@ asol = integrate.odeint(solver, [N - start_infection,
                                  start_infection,
                                  0], t)
 asol = asol * 100
-plt.figure(figsize=(12, 8))
-plt.plot(t, asol[:, 0], ls='-', color='g')
-plt.plot(t, asol[:, 1], ls='-', color='r')
-plt.plot(t, asol[:, 2], ls='-', color='b')
+plt.figure(figsize=(12, 6))
+plt.plot(t, asol[:, 0], ls='-', color='SteelBlue')
+plt.plot(t, asol[:, 1], ls='-', color='IndianRed')
+plt.plot(t, asol[:, 2], ls='-', color='Olive')
 plt.legend(["Susceptible", "Infected", "Recovered"], loc=7, fontsize=12)
 plt.title("Theorical SIR. beta={0:.2f}, gamma={1:.2f}".format(
     beta, gamma
