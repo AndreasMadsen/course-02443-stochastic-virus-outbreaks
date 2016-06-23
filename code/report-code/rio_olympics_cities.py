@@ -51,7 +51,7 @@ def control_variate_conf(y, x, verbose=False):
     if verbose:
         print(np.corrcoef(x, y))
 
-    c = np.cov(x, y)[1, 0] / np.var(x, ddof=1)
+    c = -np.cov(x, y)[1, 0] / np.var(x, ddof=1)
     z = y + c * (x - np.mean(x))
 
     std_z = np.std(z, ddof=2)

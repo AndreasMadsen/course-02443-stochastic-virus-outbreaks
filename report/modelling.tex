@@ -92,11 +92,11 @@ R_{k,t} &= R_{k,t-1} + \Delta R_{k, t} + \sum_{i \in K} \left(\textsc{Binom}(R_{
 \subsubsection{Transfer using Dirichlet distribution}
 A problem with this approach, is the small risk that $\textsc{Binom}(S_{i, t-1}, \tau_{i,k}) = 0$ and $\textsc{Binom}(S_{k, t-1}, \tau_{k,i}) = S_k$ or similar unfortunate combination which would cause $S_{k,t}$ to become negative (i.e. there is a small non zero probability that if transfers are drawn independently that an unfeasible state would occur). In practice, this is a big problem if the number of regions is large. The only way to avoid this problem is to sample all the transfers for a region simultaneously such that $\sum_{i \in K} \textsc{Binom}(S_{k,t-1}, \tau_{k,i}) \le S_{k, t}$.
 
-As there does not exist a multivariate version of the binomial distribution, the Dirichlet distribution is used as an approximation. This is convenient because $\sum_{i} X_{i,k} = 1$ if $\mathbf{X}_k \sim \textsc{Dir}(\boldsymbol{\alpha}_k)$. Because the Dirichlet distribution has support $X_i \in [0, 1]$, $\iround*{N_k X_{i,k}}$ is used.
+As there does not exist a multivariate version of the binomial distribution, the Dirichlet distribution is used as an approximation. This is convenient because $\sum_{i} X_{k, i} = 1$ if $\mathbf{X}_k \sim \textsc{Dir}(\boldsymbol{\alpha}_k)$. In addition because the Dirichlet distribution has support $X_{k, i} \in [0, 1]$, so using $\iround*{N_k X_{k, i}}$ as the transfer amount we are guaranteed that each transfer is between $0$ and $N_k$ and that the sum of transfers is $N_k$.
 
 Furthermore to reduced the amount of sampling, the total transfer $T$ is sampled instead of sampling $S$, $I$ and $R$ independently.
 
-To approximate the binomial distribution using a Dirichlet distribution the expectation is set to be the same. To simplify notation region $k$ is omitted from the subscript and the summarization of $tau_k$ and $\alpha_i$ is introduced:
+To approximate the binomial distribution using a Dirichlet distribution the expectation is set to be equal. To simplify notation region $k$ is omitted from the subscript and the summation of $\tau_k$ and $\alpha_i$ is introduced:
 \begin{equation}
 \tau_s = \sum_{k = 1}^{K} \tau_k, \quad \alpha_s = \sum_{k = 1}^{K+1} \tau_k
 \end{equation}
@@ -106,13 +106,13 @@ To approximate the binomial distribution using a Dirichlet distribution the expe
 \label{dir-expected-trans}
 \end{equation}
 
-To allow $\sum_{i} X_{i,k} \le 1$ the Dirichlet distribution is extended with another variable $X_{k, K+1}$, which will be how large a proportion region $k$ should keep.
+To allow $\sum_{i} X_{i,k} \le 1$ the Dirichlet distribution is extended with another variable $X_{k, K+1}$, which is how many individuals region $k$ should not transfer.
 \begin{equation}
 \mathbb{E}[T_{K+1}] = \mathbb{E}[N X_{K+1}] \Leftrightarrow N \left(1 - \tau_s\right) = N \frac{\alpha_{K+1}}{\alpha_s}
 \label{dir-expected-stay}
 \end{equation}
   
-This is a linear system with n variables and n equations, but it turns out not to have full rank. To add another equation the variance of $T_{K+1}$ is also set to be the same.
+This is a linear system with n variables and n equations, but it turns out that it does not to have full rank. To add another equation the variance of $T_{K+1}$ is also set to be equal.
 \begin{equation}
 \textsc{Var}[T_{K+1}] = \textsc{Var}[N X_{K+1}] \Leftrightarrow N\tau_s (1 - \tau_s) = N^2 \frac{\alpha_{K+1}(\alpha_s - \alpha_{K+1})}{\alpha_s^2 (\alpha_s + 1)}
 \label{dir-var}
@@ -144,14 +144,14 @@ Using this method for choosing $\alpha$, gives the distribution as seen in Figur
 \begin{figure}[H]
 	\centering
 	\includegraphics[width= 0.8 \linewidth]{plots/dirichlet-validation-marginal}
-	\caption{Compare the marginal probability $P(\iround*{N X_1})$ with the binomial distribution. The Dirichlet distribution upscaled by $N$, with $\tau = (0.1, 0.1)$ and $N = 100$.}
+	\caption{Comparison of the marginal probability $P(\iround*{N X_1})$ with the binomial distribution. The Dirichlet distribution was scaled up by $N$, $\tau = (0.1, 0.1)$ and $N = 100$.}
 	\label{fig:dirichlet-validation-marginal}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width= 0.8 \linewidth]{plots/dirichlet-validation-pdf}
-	\caption{Shows the Dirichlet pdf with $X_3 = 1- X_1 - X_2$. The Dirichlet distribution is upscaled by $N$, with $\tau = (0.1, 0.1)$ and $N = 100$.}
+	\caption{Shows the Dirichlet pdf with $X_3 = 1- X_1 - X_2$. The Dirichlet distribution is scaled with $N$, $\tau = (0.1, 0.1)$ and $N = 100$.}
 \end{figure}
 
 \subsection{Transfer probabilities}
@@ -166,12 +166,12 @@ Using an equal transfer probability one gets $\tau_{k, i} = \frac{p_{transfer}}{
 \tau_{k, i} = \frac{p_{transfer}}{K_k} + \frac{p_{transfer}}{K_i} = p_{transfer} \left(\frac{1}{K_k} + \frac{1}{K_i}\right)
 \end{equation}
 
-Finally one should take care, not to transfer more people to the destination than what is already in the destination. To prevent this the transfer probability is scaled with relative population.
+Finally one should be wary of transferring more people to the destination than what is already in the destination. To prevent this the transfer probability is scaled with relative population.
 \begin{equation}
 \tau_{k, i} = p_{transfer} \frac{N_i}{N_k + N_i} \left(\frac{1}{K_k} + \frac{1}{K_i}\right)
 \end{equation}
 
-Using transfer probability will maintain the population over time, as the transfer expectation is symmetric:
+Using these transfer probabilities the total population will be unchanged since the transfer expectation is symmetric:
 \begin{equation}
 \mathbb{E}[N_k \tau_{k, i}] = \mathbb{E}[N_i \tau_{i, k}] \Leftrightarrow N_k \tau_{k, i} = N_i \tau_{i, k}
 \end{equation}
