@@ -18,7 +18,7 @@ sim = Simulator(state, transfer_prob=0.005, beta=2, gamma=0.5, verbose=True,)
 sim.add_event(2560, days=18, total_transfer=380e3)
 base_map = WorldMap(resolution="c")
 base_map.animate(sim, frames=len_simulation, max_infected=0.1)
-base_map.ani.save(path.join(this_dir, '../../report/plots/gifs/rio.mpg'),
+base_map.ani.save(path.join(this_dir, '../../report/plots/gifs/rio.mp4'),
                   writer="mencoder_file", fps=3, savefig_kwargs={'bbox_inches':'tight'})
 
 
@@ -27,5 +27,5 @@ state.set_outbreak('Rio De Janeiro', 1000)
 sim = Simulator(state, transfer_prob=0.005, beta=2, gamma=0.5, verbose=True)
 base_map = WorldMap(resolution="c")
 base_map.animate(sim, frames=len_simulation, max_infected=0.1)
-base_map.ani.save(path.join(this_dir, '../../report/plots/gifs/no_rio.mpg'),
+base_map.ani.save(path.join(this_dir, '../../report/plots/gifs/no_rio.mp4'),
                   writer="mencoder_file", fps=3, savefig_kwargs={'bbox_inches':'tight'})
