@@ -1,35 +1,30 @@
 %!TEX root = main.tex
 \section{Simulation setup}
 \subsection{Variance reduction}
-Because the simulation can be time consuming to run we want to lower the variance of the estimated parameters as much as possible relative to the computational resources used. 
+Because the simulation can be time consuming to run, we want to lower the variance of the estimated parameters as much as possible relative to the computational resources used.
 
 \subsubsection{Control Variates}
-Control variates is a variance reduction technique which can be used to reduce the variance of the estimated expected value $\hat{\mu} =E[Y]$. It works by drawing a variable $x_i$ such that $Y_i \approx f(x_i)$. One can then estimate $\hat{\mu} =E[Z]$ where $Z$ is given by
-
+Control variates is a variance reduction technique which can be used to reduce the variance of the estimated expected value $\hat{\mu} = \mathbb{E}[Y]$. It works by drawing/calculating a variable $X_i$ such that $Y_i \approx f(X_i)$. One can then estimate $\hat{\mu} = \mathbb{E}[Z]$ where $Z$ is given by:
 \begin{align}
-Z_i = Y_i - c (X_i - E[X]) 
+Z_i = Y_i - c (X_i - \mathbb{E}[X])
 \end{align}
 
-. Choosing $c = \dfrac{Cov(X, Y)}{Var(X)}$ we expect a variance reduction of
-
+Choosing $c = \dfrac{Cov(X, Y)}{Var(X)}$ gives the largest variance reduction of:
 \begin{equation}
-\frac{Var(E[Z])}{Var(E[Y])} = \frac{ Var(\frac{1}{N} \sum_i Z_i) }{ Var(\frac{1}{N} \sum_i Y_i )} = 1 - \rho_{x, y}^2
+\frac{Var(Z)}{Var(Y)} = \frac{Var(X)}{Var(X)} - \frac{Cov(X, Y)^2}{Var(X) Var(Y)} = 1 - \rho_{x, y}^2
 \end{equation}
 
-. Since we don't have an analytic expressions for the covariance or variance of our random variables we will use the approach of
-
+In our case there is no analytical expression for the covariance or variance of the random variables. Instead $c$ is estimated from a second dataset. The procedure is:
 \begin{enumerate}
 	\item Draw $N_0$ samples $(X_{0,i}, Y_{0, i})$ and calculate $\hat{c}$
-	\item Draw $N$ samples $(X_i, Y_i)$ and estimate $E[Z] = \frac{1}{N} \sum_i \left( Y_i - \hat{c} (X_i - \frac{1}{N}\sum_i X_i) \right)  $
+	\item Draw $N$ samples $(X_i, Y_i)$ and estimate $\mathbb{E}[Z] = \mathbb{E}[X]$ and $Var(Z)$.
 \end{enumerate}
-
-.
 
 \subsection{Effect of Global Events}
 We want to estimate what effect a global event can have on a virus-outbreak. We define an event $e$ simply as being a transfer of people from one or more regions $r_{f, i}$ to region $r_t$ at a time $t_0$, and the reverse transfer of people from $r_t$ to $r_{f, i}$ at time $t_1$.
 
 \subsubsection{Motivation: Zika virus}
-Recently, a new virus has been observed in South and Latin America. The Zika virus affects pregnant women's fetuses and can cause serious birth-defects. The Zika virus is primarily spread by mosquitoes but can also spread from a man to his sex partners (and from mother to fetus). Some political discussions have been made as to whether or not the Olympic Games should be canceled to prevent the spreading of the virus. 
+Recently, a new virus has been observed in South and Latin America. The Zika virus affects pregnant women's fetuses and can cause serious birth-defects. The Zika virus is primarily spread by mosquitoes but can also spread from a man to his sex partners (and from mother to fetus). Some political discussions have been made as to whether or not the Olympic Games should be canceled to prevent the spreading of the virus.
 
 In this report we will run a "hypothetical" simulation showing how the a virus could spread assuming inter-human infections. As such this simulation is primarily an attempt of showing how such a model would work and not a realistic simulation Zika virus predictor.
 
