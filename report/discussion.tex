@@ -2,8 +2,10 @@
 
 \section{Discussion}
 \subsection{Control Variates}
+\todo{This is true, but no longer apparent from our results. I think we should remove it and write something else.}
 When using control variates for estimating the peak number of infected individuals it seems like we severely underestimate the actual variance. After having spent quite some time ensuring that our code doesn't contain errors we've tried to implement a small control variate example in R trying to estimate $\int_0^1 exp(x) dx$. Even in this simply example the estimated control variate variance is way too small. We've had a TA briefly look at our R code and results without him being able to explain our observations. So we don't have a good explanation for the results.
-	In some examples we also saw that the control variate method actually yielded a larger confidence interval than the crude method. This is because we estimate an extra parameter $c$ when constructing the control which means that we have one degree of freedom less when constructing the confidence interval. If the control variates aren't sufficiently correlated the "actual" variance of the estimate wont improve. This is the case for some of the peak time which naturally have a small variance.
+
+In some examples we also saw that the control variate method actually yielded a larger confidence interval than the crude method. This is because we estimate an extra parameter $c$ when constructing the control which means that we have one degree of freedom less when constructing the confidence interval. If the control variates aren't sufficiently correlated the "actual" variance of the estimate wont improve. This is the case for some of the peak time which naturally have a small variance.
 
 \subsection{Effect of Olympic Games}
 As expected when the Olympic Games are included in our model we saw that the virus spreads faster and thus has a higher peak infection count. Furthermore this could also be confirmed visually from our animations in which simulations with the Olympic Games showed high activation across the global at the same time. In simulations without the games it was much more apparent how the virus first spread to regions in the following order:

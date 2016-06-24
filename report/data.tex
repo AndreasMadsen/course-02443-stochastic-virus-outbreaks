@@ -17,11 +17,11 @@ The population data used in this report comes from NASA \cite{nasa-population}. 
 	\caption{Plot of population in the world, the used resolution is $0.1 \times 0.1$ degrees per pixel ($3600 \times 1800$).}
 \end{figure}
 
-The population dataset encodes $99999.0$ as water and $1.0369266$ as unknown population on land. Thus to get a population map, a raster map of $(x_i < 99999.0 \wedge x_i > 1.0369266) * x_i$ was applied. After this transformation the total world population is just $60,031,128$ (without filtering it is $434,130,384,806$). This is obviously wrong, thus the data is upscaled such the sum is 7.4 billion people.
+The population dataset encodes $99999.0$ as water and $1.0369266$ as unknown population on land. Thus to get a population map, a raster mapping of $(x_i < 99999.0 \wedge x_i > 1.0369266) \cdot x_i$ was applied. After this transformation the total world population is just $60,031,128$ (without filtering it is $434,130,384,806$). This is obviously wrong, thus the data is upscaled such the sum is 7.4 billion people, which is the estimated number of people in March 2016 \cite{wiki-world-population}.
 
 \subsection{Airport}
 
-The airport connection data was taken from OpenFlights \cite{openflights}. The dataset contains 8021 airports with 37181 airline connections as well as the plane types flying the connection (this could potentially be used for estimating passenger counts). Some the airports did not have any connections and where thus removed.
+The airport connection data was taken from OpenFlights \cite{openflights}. The dataset contains 8021 airports with 37181 airline connections as well as the plane types flying the connection (this could potentially be used for estimating passenger counts). Some airports did not have any connections and where thus removed. After this filtering 3256 airports where left.
 
 Plotting the airport connections we see that Europe, East Coast US and East Cost China are the most connected regions. So if a virus spreads takes hold in these areas we would expect it to cause a global outbreak quickly.
 

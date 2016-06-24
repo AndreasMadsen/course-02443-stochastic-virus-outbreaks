@@ -1,7 +1,7 @@
 %!TEX root = main.tex
 \section{Results}
 \subsection{With and without Olympic Games}
-Choosing $\beta=2$, $\gamma=0.5$ and an average transfer probability of $0.005$ we can run a simulation with and without the Olympic Games occurring with the previously described characteristics. We assume that the infection breaks out on the first day of the games in Rio De Janeiro. We set the initial infected population to 1000. In the following we will look at the SIR curves of 6 major cities.
+Choosing infection rate $\beta=2$, removal rate $\gamma=0.5$ and an transfer probability $p_{transfer} = 0.005$ we can run a simulation with and without the Olympic Games occurring. We start the simulation at the first day of the games in Rio De Janeiro and set the initial infected population in Rio to 1000. In the following we will look at the SIR curves of 6 major cities.
 
 With the Olympics occurring we get the following curves:
 \begin{figure}[H]
@@ -11,7 +11,7 @@ With the Olympics occurring we get the following curves:
 	\label{fig:rio-0-18-380000}
 \end{figure}
 
-From figure \ref{fig:rio-0-18-380000} it's seen that except for Rio where the infection started and New York which seems to be infected earliest, the other major cities all seem to reach peak infection rates at approximately the same time. 
+From figure \ref{fig:rio-0-18-380000} it's seen that except for Rio where the infection started and New York which seems to be infected earliest, the other major cities all seem to reach its infection peak at approximately the same time. 
 
 \begin{figure}[H]
 	\centering
@@ -20,7 +20,7 @@ From figure \ref{fig:rio-0-18-380000} it's seen that except for Rio where the in
 	\label{fig:no_rio}
 \end{figure}
 
-When there is no Olympic Games, as seen in figure \ref{fig:no_rio}, the peak infections occur later, especially for Moscow, Beijing and Sydney. The is emphasized in the summary table \ref{table:olympic-summary}.
+When there is no Olympic Games, as seen in figure \ref{fig:no_rio}, the infection peaks occur later, especially for Moscow, Beijing and Sydney. The is emphasized in the summary table \ref{table:olympic-summary}.
 
 \begin{table}[H]
 	\centering
@@ -29,13 +29,13 @@ When there is no Olympic Games, as seen in figure \ref{fig:no_rio}, the peak inf
 	\label{table:olympic-summary}
 \end{table}
 
-As mentioned in table \ref{table:olympic-summary} one can see that when the Olympic Games occur the peak time is much less spread and generally happens earlier. This is particularly apparent when comparing with the global peak time, which in the case without Olympic Games, happens statistically significantly later when comparing to the cities. However, in the Olympic Games case, the city peak times are not statistical different from the global peak time (except for the New York and Rio).
+As mentioned, in table \ref{table:olympic-summary} one can see that when the Olympic Games occur the peak time is much less spread and generally happens earlier. This is particularly apparent when comparing with the global peak time, which in the case without Olympic Games, happens statistically significantly later than the shown cities. However, in the Olympic Games case, the city peak times are not statistical different from the global peak time (except for the New York and Rio).
 
 The fact that Rio doesn't have a significantly difference in peak time makes sense because this is where the infection starts. Adding 380000 people (out of 12 million people) doesn't make much of a difference. The New York case is also interesting as there isn't a significant change. This is likely because New York being in north America and Rio being in South America is much more closely connected through airlines, compared to cities which are across the Pacific or Atlantic Ocean.
 
 Finally table \ref{table:olympic-summary} also shows that the number of people infected globally is almost twice as big when including the Olympic Games compared to not including the Olympic Games.
 
-Finally table \ref{table:olympic-summary} also shows that the number of people infected globally is almost twice as big when including the Olympic Games compared to not including the Olympic Games.
+\todo{Comment on control variates.}
 
 \subsection{Visualization of result}
 When studying a virus outbreak it is interesting to see exactly how the virus spreads. We have thus created an animation on a world map showing where each region is represented as a dot. Each dot is placed at the region center (airport), scaled according to the population size, and the color represents the fraction infected.

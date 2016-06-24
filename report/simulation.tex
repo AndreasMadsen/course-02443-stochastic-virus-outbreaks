@@ -9,42 +9,43 @@ Control variates is a variance reduction technique which can be used to reduce t
 Z_i = Y_i - c (X_i - \mathbb{E}[X])
 \end{align}
 
-Choosing $c = \dfrac{Cov(X, Y)}{Var(X)}$ gives the largest variance reduction of:
+Choosing $c = \frac{Cov(X, Y)}{Var(X)}$ gives the largest variance reduction of:
 \begin{equation}
-\frac{Var(Z)}{Var(Y)} = \frac{Var(X)}{Var(X)} - \frac{Cov(X, Y)^2}{Var(X) Var(Y)} = 1 - \rho_{x, y}^2 \label{eq:variance-reduction}
+\frac{Var[Z]}{Var[Y]} = \frac{Var[Y]}{Var[Y]} - \frac{Cov(X, Y)^2}{Var[X] Var[Y]} = 1 - \rho_{x, y}^2 \label{eq:variance-reduction}
 \end{equation}
 
-In our case there is no analytical expression for the covariance or variance of the random variables. Instead $c$ is estimated from a second dataset. The procedure is:
-\begin{enumerate}
-	\item Draw $N_0$ samples $(X_{0,i}, Y_{0, i})$ and calculate $\hat{c}$
-	\item Draw $N$ samples $(X_i, Y_i)$ and estimate $\mathbb{E}[Z] = \mathbb{E}[X]$ and $Var(Z)$.
-\end{enumerate}
+In our case there is no analytical expression for the covariance or variance of the random variables. Instead $c$ is estimated from the dataset itself. This introduces some overfitting, thus one should take care to reduce the degrees of freedom in the variance, covariance estimates:
+\begin{equation}
+\hat{c} = \frac{Cov_{N-1}(X, Y)}{Var_{N-1}(X)}, \quad \hat{\sigma}^2 = Var_{N-2}(Z)
+\end{equation}
+
+The subscript denotes the degrees of freedom, and $\hat{\sigma}^2$ has $N - 2$ degrees of freedom, because $\hat{c}$ is estimated from the dataset.
 
 \subsubsection{Estimating infection rate}
 
-From \eqref{eq:variance-reduction} it seen that to get a high variance reduction, $X_i$ just need to be heavily correlated with $Z_i$. In our case we would like to estimate the infection peak time and how many people where infected at the peak. From the theoretical differential equation model those values should correlated with the infection rate $\beta$.
+From \eqref{eq:variance-reduction} it seen that to get a high variance reduction, $X_i$ just need to be heavily correlated with $Z_i$. In our case we would like to estimate the infection peak time and how many people where infected at the peak. From the theoretical differential equation model those values should be correlated with the infection rate $\beta$.
 
 Assuming the stochastic model have a behaviour somewhat similar to the differential equation model, there exists fairly simple methods for estimating $\beta$ and $\gamma$ \cite{wiki-sir}.
 \begin{equation}
 \gamma = \frac{R'_{max}}{I_{max}} \text{ and } \beta = -\frac{\ln(p)}{1 - p} \gamma \quad \text{where: } p = \frac{N - R_\infty}{N} 
 \end{equation}
 
-$R'_{max}$ is the maximum removed difference, and $I_{max}$ is the maximum infected. Due to the differential equation connection these are found at the same time $t$. $R_\infty$ is how many people where removed in the end, $p$ is thus the survival rate.
+$R'_{max}$ is the maximum removed difference, and $I_{max}$ is the maximum infected. Due to the construction of the differential equation, these are found at the same time $t$. $R_\infty$ is how many people where removed in the end, thus $p$ is the survival rate.
 
 \subsection{Effect of Global Events}
-We want to estimate what effect a global event can have on a virus-outbreak. We define an event $e$ simply as being a transfer of people from one or more regions $r_{f, i}$ to region $r_t$ at a time $t_0$, and the reverse transfer of people from $r_t$ to $r_{f, i}$ at time $t_1$.
+We want to estimate what effect a global event can have on a virus outbreak. We define an event $e$ as simply being a transfer of people from one or more regions $r_{i}$ to region $r_t$ at a time $t_0$, and the reverse transfer of people from $r_t$ to $r_{i}$ at time $t_1$.
 
 \subsubsection{Motivation: Zika virus}
-Recently, a new virus has been observed in South and Latin America. The Zika virus affects pregnant women's fetuses and can cause serious birth-defects. The Zika virus is primarily spread by mosquitoes but can also spread from a man to his sex partners (and from mother to fetus). Some political discussions have been made as to whether or not the Olympic Games should be canceled to prevent the spreading of the virus.
+Recently, a new virus has been observed in South and Latin America. The Zika virus affects pregnant women's fetuses and can cause serious birth defects. The Zika virus is primarily spread by mosquitoes, but can also spread from a man to his sex partners (and from mother to fetus). Some political discussions have been made as to whether or not the Olympic Games should be canceled to prevent the spreading of the virus.
 
-In this report we will run a "hypothetical" simulation showing how the a virus could spread assuming inter-human infections. As such this simulation is primarily an attempt of showing how such a model would work and not a realistic simulation Zika virus predictor.
+In this report we will run a "hypothetical" simulation, showing how the a virus could spread assuming inter-human infections. As such this simulation is primarily an attempt of showing how such a model would work and not a realistic Zika virus predictor.
 
 \subsubsection{Event definition: Olympic Games in Rio 2016}
-In our simulation we define the Olympic Games to take place during $t_0=$ '2016-07-03' and $t_1$='2016-07-21'. According to \cite{theguardian-olympics} Rio expects to recieve 380,000 tourist. We choose to transfer people from all over the world to Rio such that the transfer is proportional to the population size of the region:
+In our simulation we define the Olympic Games to take place during $t_0=$ `2016-07-03' and $t_1=$ `2016-07-21'. According to The Gaurdian \cite{theguardian-olympics} Rio expects to recieve 380,000 tourist. We choose to transfer people from all over the world to Rio, such that the transfer is proportional to the population size of each region:
 
 \begin{align}
-	\text{Transfer}_0(i, j) &= 380000 \cdot \frac{ \text{pop}_i}{N} \\
-	\text{Transfer}_1(j, i) &= transfer_0()i, j)
+	\text{Transfer}_0(i, j) &= 380000 \cdot \frac{\text{population}_i}{N} \\
+	\text{Transfer}_1(j, i) &= \text{transfer}_0(i, j)
 \end{align}
 
-where $text{Transfer}_0(i, j) $ denotes the number of people transferred from region $i$ to region $j$ at the start of the Olympics and $ \text{Transfer}_1(j, i) $ the people transferred from $j$ to $i$ at the end of the Olympics,
+where $\text{Transfer}_0(i, j)$ denotes the number of people transferred from region $i$ to region $j$ at the start of the Olympics and $ \text{Transfer}_1(j, i) $ the people transferred from $j$ to $i$ at the end of the Olympics.
