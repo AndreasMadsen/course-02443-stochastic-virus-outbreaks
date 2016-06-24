@@ -156,7 +156,7 @@ Using this method for choosing $\alpha$, gives the distribution as seen in figur
 
 \subsection{Transfer probabilities}
 
-The GLEaM model \cite{GLEaM} uses a gravity law for transferring people between neighboring regions and airline data for transferring people between airports. Unfortunately the GLEaM paper does not specify all the parameters for the gravity law equation and our airline dataset does not contain the traveling frequency. Instead a much simpler model, where the proportional transfer expectation is fixed to some constant, is used:
+The GLEaM model \cite{GLEaM} uses a gravity law for transferring people between neighboring regions within the same country and airline data for transferring people between airports. Unfortunately the GLEaM paper does not specify all the parameters for the gravity law equation and our airline dataset does not contain the traveling frequency. Instead a much simpler model, where the proportional transfer expectation is fixed to some constant, is used:
 \begin{equation}
 \sum_{i = 1}^{K_k} \tau_{k, i} = p_{transfer}
 \end{equation}
