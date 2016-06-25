@@ -23,9 +23,9 @@ The subscript denotes the degrees of freedom, and $\hat{\sigma}^2$ has $N - 2$ d
 
 \subsubsection{Estimating infection rate}
 
-From \eqref{eq:variance-reduction} it seen that to get a high variance reduction, $X_i$ just need to be heavily correlated with $Z_i$. In our case we would like to estimate the infection peak time and how many people where infected at the peak. From the theoretical differential equation model those values should be correlated with the infection rate $\beta$.
+From \eqref{eq:variance-reduction} it seen that to get a high variance reduction, $X_i$ just need to be heavily correlated with $Y_i$. In our case we would like to estimate the infection peak time and how many people where infected at the peak. From the theoretical differential equation model those values should be correlated with the infection rate $\beta$.
 
-Assuming the stochastic model have a behaviour somewhat similar to the differential equation model, there exists fairly simple methods for estimating $\beta$ and $\gamma$ \cite{wiki-sir}.
+Assuming the stochastic model have a behaviour somewhat similar to the differential equation model, there exists a fairly simple method for estimating $\beta$ and $\gamma$ \cite{wiki-sir}.
 \begin{equation}
 \gamma = \frac{R'_{max}}{I_{max}} \text{ and } \beta = -\frac{\ln(p)}{1 - p} \gamma \quad \text{where: } p = \frac{N - R_\infty}{N} 
 \end{equation}
